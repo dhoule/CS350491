@@ -7,6 +7,14 @@
 	background-color: #800020;
 }
 
+body{
+	width: 50%;
+  margin: 0px auto;
+  color: white;
+}
+
+body img {padding :10px;}
+
 h1 {
 	text-align: center;
 } 
@@ -30,4 +38,12 @@ footer {
 	div {
 		text-align: center;
 	}
+}
+
+ol {
+	list-style-type: decimal;
+}
+
+ul {
+	list-style-type: square;
 }
