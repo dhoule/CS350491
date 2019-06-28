@@ -1,0 +1,11 @@
+/* 
+	Houle, Daniel B. 
+	CS350/491 Summer 2019 
+*/
+
+.profile-pic {
+	display: block; 
+	margin-left: auto; 
+	margin-right: auto; 
+	width: 50%;
+}

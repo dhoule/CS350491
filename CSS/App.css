@@ -3,6 +3,10 @@
 	CS350/491 Summer 2019 
 */
 
+@import "./main/header.css";
+@import "./main/body_section.css";
+@import "./main/footer.css";
+
 * {
 	background-color: #800020;
 }
@@ -27,23 +31,5 @@ div {
 	text-align: left;
 }
 
-.profile-pic {
-	display: block; 
-	margin-left: auto; 
-	margin-right: auto; 
-	width: 50%;
-}
 
-footer {
-	div {
-		text-align: center;
-	}
-}
 
-ol {
-	list-style-type: decimal;
-}
-
-ul {
-	list-style-type: square;
-}
