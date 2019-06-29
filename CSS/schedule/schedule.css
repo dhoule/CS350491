@@ -1,0 +1,91 @@
+/* 
+	Houle, Daniel B. 
+	CS350/491 Summer 2019 
+*/
+
+.weekly-schedule-body {
+	display: flex; 
+	justify-content: center;
+}
+
+.weekly-schedule-table, th, td {
+	border: 1px solid black;
+}
+
+.weekly-schedule-table ol { 
+	padding-inline-start: 20px; 
+	margin-block-start: 0;
+	margin-block-end: 0;
+	list-style-position: inside;
+}
+
+.weekly-schedule-table td {
+	text-align: center;
+}
+
+.weekly-schedule-table .alternating-day-one {
+	border: solid 0 black; 
+	border-width: 4px 1px 1px 4px;
+}
+
+.weekly-schedule-table .alternating-day-two {
+	border: solid 0 black; 
+	border-width: 4px 4px 4px 1px;
+}
+
+.weekly-schedule-table .alternating-day-three {
+	border: solid 0 black; 
+	border-width: 1px 1px 4px 4px;
+}
+
+.weekly-schedule-table .alternating-day-four {
+	border: solid 0 black; 
+	border-width: 4px 1px 4px 2px;
+}
+
+.schedule-footer-table {
+	display: table;
+}
+
+.schedule-footer-row { display: table-row;}
+
+.schedule-footer-row > * {
+	display: table-cell;
+}
+
+
+.schedule-button {
+    border: 0;
+    line-height: 2.5;
+    padding: 0 20px;
+    font-size: 1rem;
+    text-align: center;
+    color: #fff;
+    text-shadow: 1px 1px 1px #000;
+    border-radius: 10px;
+    background-color: rgba(220, 0, 0, 1);
+    background-image: linear-gradient(to top left,
+                                      rgba(0, 0, 0, .2),
+                                      rgba(0, 0, 0, .2) 30%,
+                                      rgba(0, 0, 0, 0));
+    box-shadow: inset 2px 2px 3px rgba(255, 255, 255, .6),
+                inset -2px -2px 3px rgba(0, 0, 0, .6);
+}
+
+.schedule-button:hover {
+    background-color: rgba(255, 0, 0, 1);
+}
+
+.schedule-button:active {
+    box-shadow: inset -2px -2px 3px rgba(255, 255, 255, .6),
+                inset 2px 2px 3px rgba(0, 0, 0, .6);
+}
+
+
+
+
+
+
+
+
+
