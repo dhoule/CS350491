@@ -8,3 +8,13 @@ footer {
 		text-align: center;
 	}
 }
+
+.main-footer-table {
+	display: table;
+}
+
+.main-footer-row { display: table-row;}
+
+.main-footer-row > * {
+	display: table-cell;
+}
