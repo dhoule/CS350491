@@ -10,3 +10,13 @@ ol {
 ul {
 	list-style-type: square;
 }
+
+.main-story-time-table {
+	display: table;
+}
+
+.main-story-time-row { display: table-row;}
+
+.main-story-time-row > * {
+	display: table-cell;
+}

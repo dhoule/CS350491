@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="author" content="Houle, Daniel B."> 
+    <meta name="description" content="This page is to be used by users to file issues/comments">
+    <title>Feedback - CS350/491 Project 2</title> 
+    <link rel="stylesheet" href="../CSS/App.css">
+    <link rel="stylesheet" href="../CSS/feedback/feedback.css">
+    <script>
+      // Function will be used to, eventually, start events to send an email to the user
+
+      function sendEmail(form) {
+        var title, firstName, lastName, email, comments; // Setting up the variables
+        var collection = new Array(); // Holds messages to display to the user
+        var text = ""; // Used to build all messages
+
+        // Recheck the validity of the elements and collect messages if not valid
+        if (!form.elements["first-name"].checkValidity()) {
+          collection.push("\"First Name\" is a required field");
+        }
+        if (!form.elements["last-name"].checkValidity()) {
+          collection.push("\"Last Name\" is a required field");
+        }
+        if (!form.elements["email"].checkValidity()) {
+          collection.push("\"Email\" is a required field and must be a valid email");
+        }
+        if (!form.elements["body-text"].checkValidity()) {
+          collection.push("\"Message\" is a required field");
+        }
+        if (collection.length > 0) {
+          for (var element of collection) {
+            text += element + "\n";
+          }
+          alert(text);
+          return false;
+        }
+
+        title = form.elements["title-name"].value;
+        firstName = form.elements["first-name"].value;
+        lastName = form.elements["last-name"].value;
+        email = form.elements["email"].value;
+        comments = form.elements["body-text"].value;
+
+        if (title === "") {
+          text = "Thank you for your submition, " + firstName + " " + lastName + ".";
+        }
+        else {
+          text = "Thank you for your submition, " + title + " " + lastName + ".";
+        }
+        text += "\n\nA confirmation email will be sent to you shortly."
+        alert(text);
+        return true;
+      } // end sendEmail
+
+      // Function makes sure the value of the required string fields are not empty
+
+      function validateField(dirty, field) {
+        if (dirty.value === "") {
+          if (dirty.type == "email"){
+            alert("\"Email\" is a required field and must be a valid email");
+            return false;
+          }
+          else {
+            alert(field + " is a required field");
+            return false;
+          }
+        }
+        return true;
+      } // end validateField
+
+    </script>
+  </head>
+  <body>
+    <noscript> 
+      <p>
+        This web page uses JavaScript. For proper results,
+        you must use a web browser with JavaScript enabled. 
+      </p>
+    </noscript>
+    <header>
+      <h1>Houle, Daniel B.</h1>
+    </header>
+    <hr>
+    <section>
+      <h3>Comments and/or Suggestions</h3>
+      <hr>
+        <form class="feedback-form">
+          <label for="title-name">Title:</label>
+          <input type="text" id="title-name" placeholder="Optional"><br>
+          <label for="first-name">First Name:</label>
+          <input type="text" id="first-name" placeholder="Required" required 
+                  onfocusout="validateField(this.form.elements['first-name'], 'First Name');"><br>
+          <label for="last-name">Last Name:</label>
+          <input type="text" id="last-name" placeholder="Required" required
+                  onfocusout="validateField(this.form.elements['last-name'], 'Last Name');"><br>
+          <label for="emaile">Email:</label>
+          <input type="email" id="email" placeholder="Required" required
+                  onfocusout="validateField(this.form.elements['email']);"><br>
+          <label for="body-text">Message:</label><br>
+          <textarea id="body-text" rows = "5" cols = "50" required
+                  onfocusout="validateField(this.form.elements['body-text'], 'Message');"></textarea>
+          <br>
+          <br>
+          <input class="button" type="button" value="Send" onclick="sendEmail(this.form);">
+        </form>
+    </section>
+  </body>
+  <hr>
+  <footer>
+    <div class="feedback-footer-table">
+      <div class="feedback-footer-row">
+        <a class="button" href="../index.htm">Back to Main page</a>
+        <a class="button" href="https://github.com/dhoule" target="_blank">GitHub Account</a>
+      </div>
+    </div>
+  </footer>
+ </html>
