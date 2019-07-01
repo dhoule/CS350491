@@ -8,10 +8,14 @@
     <link rel="stylesheet" href="../CSS/App.css">
     <link rel="stylesheet" href="../CSS/feedback/feedback.css">
     <script>
+      // Function will be used to, eventually, start events to send an email to the user
+
       function sendEmail(form) {
         var title, firstName, lastName, email, comments; // Setting up the variables
         var collection = new Array(); // Holds messages to display to the user
         var text = ""; // Used to build all messages
+
+        // Recheck the validity of the elements and collect messages if not valid
         if (!form.elements["first-name"].checkValidity()) {
           collection.push("\"First Name\" is a required field");
         }
@@ -22,7 +26,7 @@
           collection.push("\"Email\" is a required field and must be a valid email");
         }
         if (!form.elements["body-text"].checkValidity()) {
-          collection.push("\"Comments/Concerns/Suggestions\" is a required field");
+          collection.push("\"Message\" is a required field");
         }
         if (collection.length > 0) {
           for (var element of collection) {
@@ -47,11 +51,12 @@
         text += "\n\nA confirmation email will be sent to you shortly."
         alert(text);
         return true;
-      }
+      } // end sendEmail
+
+      // Function makes sure the value of the required string fields are not empty
 
       function validateField(dirty, field) {
         if (dirty.value === "") {
-          console.log(dirty.type);
           if (dirty.type == "email"){
             alert("\"Email\" is a required field and must be a valid email");
             return false;
@@ -62,7 +67,7 @@
           }
         }
         return true;
-      }
+      } // end validateField
 
     </script>
   </head>
@@ -92,9 +97,9 @@
           <label for="emaile">Email:</label>
           <input type="email" id="email" placeholder="Required" required
                   onfocusout="validateField(this.form.elements['email']);"><br>
-          <label for="body-text">Comments/Concerns/Suggestions:</label><br>
+          <label for="body-text">Message:</label><br>
           <textarea id="body-text" rows = "5" cols = "50" required
-                  onfocusout="validateField(this.form.elements['body-text'], 'Comments/Concerns/Suggestions');"></textarea>
+                  onfocusout="validateField(this.form.elements['body-text'], 'Message');"></textarea>
           <br>
           <br>
           <input class="button" type="button" value="Send" onclick="sendEmail(this.form);">
