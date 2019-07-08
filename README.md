@@ -32,3 +32,30 @@ Project 2. Due July 1, Monday (midnight). Based/continuing on Project 1, add the
 7. Grading scale: get 80% if basic (explicitly described) requirements are met; the remaining 20% is at the instructor’s discretion according to professionalism, aesthetic, and the implied effort (These are hard to be put in a specific requirement).
 8. Tips to get maximum score: Think in a professional way, do a little more than the basic requirement, be thoughtful and creative. Maximally satisfy/please the potential users/ visitors (to your webpage) – I am one of them.
 ```
+
+Project 3 requirements:
+```
+1. Further improve your project 2 using the new mechanisms and skills addressed since Project 2 (i.e., chapter 9 
+	to chapter 12), especially on the layout and the overall looks of your pages. You may consider splitting your 
+	index page into multiple pages (like many of you had already done with Project2), leaving the main (index) page 
+	as the entry/portal page with a general introduction and links well organized (e.g., in a sidebar) that point to 
+	other content pages.
+2. Enhance the validity check of user input to the feedback form you already did with Project 2: set and enforce 
+	required entries, and particularly verify the format of email and phone number (e.g., 618-453-6011) to make sure 
+	they are valid email address and phone number.
+3. Add a really fun element to your home page: shape transformation game. Initially, preset a canvas (Chapter 12) 
+	element as a hidden place holder (without taking any visual space).Upon a user clicks on the button, a boxed 
+	canvas area (nicely fit into your page’s overall layout) shows up with an instruction displayed inside: e.g., 
+	“Please click on 5 arbitrary spots within this box, and see my shape transformation magic to happen.” Behind the 
+	scene, you will need to use JavaScript to locate the five points the user clicked on, randomly select five shapes 
+	(e.g., from the list of rectangle, square, circle, oval, triangle, line) and center them each around one of the 
+	five points, with a random color (selected from the list of 7 common colors: red, orange, yellow, green, cyan, 
+	blue, purple) for both the shapes and the filling (of a closed shape). The dimensions of the shapes shall be 
+	randomly set, too, from the range of 1/6 to 1/2 of the width of the canvas’ area. Keep the above process repeat in 
+	a pace so that the user will be able to observe the shapes’ random changing/transforming/alternation (in position, 
+	shape, color, and size, etc.). The repeated transformation shall be stopped/reset if the user clicks on anywhere 
+	in transformer canvas. (Hint: you will need to use event.clientX and event.clientY to get the coordinates of the 
+	five points within the canvas clicked on by the user; you may need to give a pause within the loop to avoid the 
+	shapes transforming too fast for human vision to discern. Notice that I only made a very basic description of the 
+	shape transformation game; it is up to you to tap your creativity and make the game a real fun.)
+ ```
