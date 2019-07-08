@@ -1,25 +1,25 @@
 /* 
-	Houle, Daniel B. 
-	CS350/491 Summer 2019 
+  Houle, Daniel B. 
+  CS350/491 Summer 2019 
 */
 
 h3 {
-	text-align: center;
+  text-align: center;
 } 
 
 .feedback-footer-table {
-	display: table;
-	margin-bottom: 40px;
+  display: table;
+  margin-bottom: 40px;
 }
 
 .feedback-footer-row { display: table-row;}
 
 .feedback-footer-row > * {
-	display: table-cell;
+  display: table-cell;
 } 
 
 form {
-	/* Just to center the form on the page */
+  /* Just to center the form on the page */
   margin: 0 auto;
   width: 400px;
   padding: 1em;
@@ -42,12 +42,13 @@ input[type="text"]:focus, input[type="email"]:focus, textarea:focus {
 }
 
 .feedback-form {
-	background-color: white;
-	color: black;
+  background-color: white;
+  color: black;
 }
 
 .feedback-form input[type="text"], input[type="email"], label, textarea {
-	background-color: white;
+  background-color: white;
+  margin: 2px 0px;
 }
 /* This is to keep the look-&-feel consistent through out */
 input[type="button"] { cursor: pointer; }
