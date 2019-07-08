@@ -11,3 +11,6 @@ ul {
   list-style-type: square;
 }
 
+#game-play {
+	display:none;
+}
