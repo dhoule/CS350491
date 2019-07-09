@@ -11,13 +11,17 @@ ul {
   list-style-type: square;
 }
 
+#game-area {
+  width: 100%;
+  margin: 0px auto;
+}
 
 #game-play {
-	display:none;
+  display:none;
 }
 
 #game-controls {
-	display:none;
+  display:none;
 }
 
 input[type="button"] { cursor: pointer; }
