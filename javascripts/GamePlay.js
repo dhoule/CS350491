@@ -18,19 +18,26 @@ function showGame() {
   canvas.style.width = "100%"; 
   canvas.style.height = "100%"; 
   canvas.style.backgroundColor = "white";
+  gameInstructions(canvas.getContext("2d"));
+  // canvas.addEventListener();
   menu.style.display = "block";
-  menu.innerHTML = '<button class="button" onclick="refreshCanvas();">Refresh</button><button class="button" onclick="clearCanvas();">Exit</button>'
+  menu.innerHTML = '<input type="button" class="button" value="Refresh" onclick="refreshCanvas();"><input type="button"  class="button" value="Exit" onclick="clearCanvas();">'
 } // end showGame
 
 // This function resets the "game" to its original settings
 function refreshCanvas() {
-
+  var canvas = document.getElementById("game-play");
+  var ctx = canvas.getContext("2d");
+  wipeCanvasClean(canvas);
+  gameInstructions(ctx);
+  Point.resetCount();
 } // end refreshCanvas
 
 // This function resets the "game" to its original settings,
 // hides everything, and brings the button "game-play-show"
 // back into view.
 function clearCanvas() {
+  refreshCanvas();
   var buttonStart = document.getElementById("game-play-show");
   buttonStart.style.display = "inline-block";
   var canvas = document.getElementById("game-play");
@@ -39,9 +46,41 @@ function clearCanvas() {
   menu.style.display = "none";
 } // end clearCanvas
 
+// function merely returns the string that informs the user what to do
+function gameInstructions(ctx) {
+  ctx.fillText("Please click on 5 arbitrary spots within this box to begin", 5, 10);
+} // end gameInstructions
+
+// function clear the canvas of everything
+function wipeCanvasClean(canvas) {
+  var ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+} // end wipeCanvasClean
+
+// This function stores a users click location as a point.
+function captureClick(e) {
+  
+  if (Point.getCount() == 0) {
+    wipeCanvasClean(document.getElementById("game-play"));
+    point1 = new Point(e.clientX, e.clientY);
+    console.log(point1);
+    // document.getElementById("pt1").innerHTML = point1.value(); 
+  }
+  else if (Point.getCount() == 1) {
+    point2 = new Point(e.clientX, e.clientY); 
+    console.log(point2);
+    // document.getElementById("pt2").innerHTML = point2.value();
+  }
+  else {
+    point1 = point2;
+    point2 = new Point(e.clientX, e.clientY); 
+    // document.getElementById("pt1").innerHTML = point1.value(); 
+    // document.getElementById("pt2").innerHTML = point2.value();
+  }
+} // end captureClick
+
 class Point {
   constructor(x, y) {
-    2
     this.x = x;
     this.y = y;
     if (Point.count == undefined) {
@@ -61,6 +100,11 @@ class Point {
   static getCount() {
     return (Point.count == undefined) ? 0 : Point.count;
   } // end getCount
+
+
+  static resetCount() {
+    Point.count = undefined;
+  } // end resetCount
 
   // Return the distance between the two points or null if one 
   // or more of the points is missing.
