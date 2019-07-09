@@ -10,7 +10,7 @@ var points = new Array();
 var shapes = new Array('rectangle', 'square', 'circle', 'oval', 'triangle', 'line');
 var colors = new Array('red', 'orange', 'yellow', 'green', 'cyan', 'blue', 'purple');
 var interval;
-const MAXPOINTS = 5;
+const MAXPOINTS = 1;
 
 // This function exposes the "game" to the user
 function showGame() {
@@ -66,6 +66,7 @@ function gameInstructions(ctx) {
 function wipeCanvasClean(canvas) {
   var ctx = canvas.getContext("2d");
   ctx.fillStyle = 'black';
+  ctx.setTransform(1,0,0,1,0,0);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 } // end wipeCanvasClean
 
@@ -78,15 +79,25 @@ function captureClick(e) {
   }
   if (Point.getCount() == MAXPOINTS) {
     e.stopPropagation();
-    interval = setInterval(runOverPoints, 1000, canvas);
+    interval = setInterval(runOverPoints, 500, canvas);
   }
 } // end captureClick
 
 // Function itterates over the `points` Array
 function runOverPoints(canvas) {
+  var ctx = canvas.getContext("2d");
+  var rand = Math.random();
   for(let point of points) {
     drawThings(point, canvas);
     point.updateColor();
+  }
+  if (rand >= 0.75) {
+    if (Math.floor(Math.random() + 0.5) == 0) {
+      ctx.translate(Math.floor(canvas.width * 0.2), Math.floor(canvas.height * 0.2));
+    }
+    else {
+      ctx.translate(Math.floor(canvas.width * 0.2) * -1, Math.floor(canvas.height * 0.2) * -1);
+    }
   }
 } //end runOverPoints
 
