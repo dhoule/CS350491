@@ -66,7 +66,7 @@ function gameInstructions(ctx) {
 function wipeCanvasClean(canvas) {
   var ctx = canvas.getContext("2d");
   ctx.fillStyle = 'black';
-  ctx.setTransform(1,0,0,1,0,0);
+  ctx.resetTransform();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 } // end wipeCanvasClean
 
