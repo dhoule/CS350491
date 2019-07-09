@@ -6,6 +6,8 @@
 * "shape transformation game" on index.htm 
 ***********************************************/
 
+var points = new Array();
+
 // This function exposes the "game" to the user
 function showGame() {
   var buttonStart = document.getElementById("game-play-show");
@@ -60,22 +62,13 @@ function wipeCanvasClean(canvas) {
 // This function stores a users click location as a point.
 function captureClick(e) {
   
-  if (Point.getCount() == 0) {
+  if (Point.getCount() < 6) {
     wipeCanvasClean(document.getElementById("game-play"));
-    point1 = new Point(e.clientX, e.clientY);
-    console.log(point1);
+    points[Point.getCount()] = new Point(e.clientX, e.clientY);
     // document.getElementById("pt1").innerHTML = point1.value(); 
   }
-  else if (Point.getCount() == 1) {
-    point2 = new Point(e.clientX, e.clientY); 
-    console.log(point2);
-    // document.getElementById("pt2").innerHTML = point2.value();
-  }
-  else {
-    point1 = point2;
-    point2 = new Point(e.clientX, e.clientY); 
-    // document.getElementById("pt1").innerHTML = point1.value(); 
-    // document.getElementById("pt2").innerHTML = point2.value();
+  if (Point.getCount() == 5) {
+    
   }
 } // end captureClick
 
@@ -85,8 +78,8 @@ class Point {
     this.y = y;
     if (Point.count == undefined) {
       Point.count = 1; }
-    else if (Point.count == 1) { 
-      Point.count = 2;
+    else if (Point.count < 6) { 
+      Point.count += 1;
     }
   } // end constructor
   
