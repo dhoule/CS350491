@@ -9,6 +9,8 @@
 var points = new Array();
 var shapes = new Array('rectangle', 'square', 'circle', 'oval', 'triangle', 'line');
 var colors = new Array('red', 'orange', 'yellow', 'green', 'cyan', 'blue', 'purple');
+var interval;
+const MAXPOINTS = 5;
 
 // This function exposes the "game" to the user
 function showGame() {
@@ -19,10 +21,11 @@ function showGame() {
   var controllButtons = '<input type="button" class="button" value="Refresh" onclick="refreshCanvas();">';
   controllButtons += '<input type="button"  class="button" value="Exit" onclick="clearCanvas();">';
   // canvas.parentElement.style.width = "100%";
-  canvas.style.display = "block"; 
-  canvas.style.position = "relative"; 
-  canvas.style.width = "100%"; 
-  canvas.style.height = "100%"; 
+  canvas.style.display = "inline-block"; 
+  // canvas.style.position = "relative"; 
+  canvas.style.margin = '0px';
+  // canvas.setAttribute("width",canvas.parentElement.style.width);  TODO
+  // canvas.setAttribute("height",canvas.parentElement.style.height);  
   canvas.style.backgroundColor = "white";
   gameInstructions(canvas.getContext("2d"));
   // canvas.addEventListener();
@@ -36,6 +39,8 @@ function refreshCanvas() {
   var ctx = canvas.getContext("2d");
   wipeCanvasClean(canvas);
   gameInstructions(ctx);
+  clearInterval(interval);
+  points.length = 0; // resets any & all references to the points Array
   Point.resetCount();
 } // end refreshCanvas
 
@@ -67,69 +72,203 @@ function wipeCanvasClean(canvas) {
 // This function stores a users click location as a point.
 function captureClick(e) {
   var canvas = document.getElementById("game-play");
-  if (Point.getCount() < 6) {
-    wipeCanvasClean(canvas);
-    points[Point.getCount()] = new Point(e.offsetX, e.offsetY);
-    // document.getElementById("pt1").innerHTML = point1.value(); 
+  if (Point.getCount() <= MAXPOINTS) {
+    if (Point.getCount() == 0) { wipeCanvasClean(canvas); }
+    points[Point.getCount()] = new Point(e.offsetX, e.offsetY, canvas);
   }
-  if (Point.getCount() == 5) {
-    for(let point of points) {
-      drawThings(point, canvas);
-    }
+  if (Point.getCount() == MAXPOINTS) {
+    e.stopPropagation();
+    interval = setInterval(runOverPoints, 1000, canvas);
   }
 } // end captureClick
+
+// Function itterates over the `points` Array
+function runOverPoints(canvas) {
+  for(let point of points) {
+    drawThings(point, canvas);
+    point.updateColor();
+  }
+} //end runOverPoints
 
 // Function draws a pseudorandom shape in a pseudorandom color
 function drawThings(point, canvas){
   var ctx = canvas.getContext("2d");
-  var shape = 'square';//shapes[Math.floor(Math.random()*shapes.length)];
-  var color = colors[Math.floor(Math.random()*colors.length)];
-  var width = getNumInRange(canvas.offsetWidth * (1/6),canvas.offsetWidth * (1/2));
-  var height = getNumInRange(canvas.offsetHeight * (1/6),canvas.offsetHeight * (1/2));
-  console.log('shape:',shape, 'color:',color, 'width:',width, 'height:',height, 'cWidth:',canvas.offsetWidth, 'cHeight:',canvas.offsetHeight,'Point:', point);
-  console.log('topX:',Math.floor(point.getX() - ( width / 2)), 'topY:',Math.floor(point.getY() - ( height / 2)));
-  ctx.fillStyle = color;
-  switch (shape) {
+  var info = point.getShapeInfo();
+
+  ctx.fillStyle = point.getColor();
+  ctx.strokeStyle = point.getColor();
+  switch (point.getShape()) {
     case 'rectangle':
-      ctx.fillRect(
-        Math.floor(point.getX() - ( width / 2)),Math.floor(point.getY() - ( height / 2)),width,height
-      );
+      ctx.fillRect(info.centerX, info.centerY, info.width, info.height);
       break;
     case 'square':
-      ctx.fillRect(
-        Math.floor(point.getX() - ( width / 2)),Math.floor(point.getY() - ( width / 2)),width,width
-      );
+      ctx.fillRect(info.centerX, info.centerY, info.width, info.width);
       break;
     case 'circle':
-      
+      ctx.beginPath();
+      ctx.arc(info.centerX, info.centerY, info.radius, info.startAngle, info.endAngle); 
+      ctx.fill();
+      ctx.stroke();
       break;
     case 'oval':
-      
+      // ctx.ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle)
+      ctx.beginPath();
+      ctx.ellipse(info.centerX, info.centerY, info.radiusX, info.radiusY, info.rotation, info.startAngle, info.endAngle);
+      ctx.fill();
+      ctx.stroke();
       break;
     case 'triangle':
-      
+      ctx.beginPath();
+      ctx.moveTo(info.oneX, info.oneY);
+      ctx.lineTo(info.twoX, info.twoY);
+      ctx.lineTo(info.thrX, info.thrY);
+      ctx.fill();
       break;
     case 'line':
-      
+      ctx.beginPath();
+      ctx.moveTo(info.oneX, info.oneY);
+      ctx.lineTo(info.twoX, info.twoY);
+      ctx.stroke(); 
       break;
   } // end switch
+  
 } // end drawThings
 
-// Function returns a number between the min and max given
-function getNumInRange(min,max) {
-  return Math.floor(Math.random() * (max - min) + min);
-} //end getNumInRange
+
+
 
 class Point {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
+  
+  constructor(x, y, canvas) {
+    this.x = x; // mouse click
+    this.y = y; // mouse click
+    this.shape = shapes[Math.floor(Math.random()*shapes.length)];
+    this.color = colors[Math.floor(Math.random()*colors.length)];
+    this.constructShapeInfo(canvas);
     if (Point.count == undefined) {
       Point.count = 1; }
     else if (Point.count < 6) { 
       Point.count += 1;
     }
   } // end constructor
+
+  // creates the shapes info
+  constructShapeInfo(canvas) {
+    var width = this.getNumInRange(canvas.offsetWidth/6,canvas.offsetWidth/2);
+    var height = this.getNumInRange(canvas.offsetHeight/6,canvas.offsetHeight/2);
+    var points;
+    switch (this.shape) {
+      case 'rectangle':
+        this.centerX = Math.floor(this.x - (width / 2));
+        this.centerY = Math.floor(this.y - (height / 2));
+        if (Math.floor(Math.random() + 0.5) == 0) {
+          this.width = width;
+          this.height = height;
+        }
+        else {
+          this.width = height;
+          this.height = width;
+        }
+        break;
+      case 'square':
+        this.centerX = Math.floor(this.x - (width / 2));
+        this.centerY = Math.floor(this.y - (height / 2));
+        this.width = width;
+        this.height = height;
+        break;
+      case 'circle':
+        this.radius = (width / 2);
+        this.centerX = this.x;
+        this.centerY = this.y;
+        this.startAngle = 0;
+        this.endAngle = 2 * Math.PI;
+        break;
+      case 'oval':
+        this.centerX = this.x;
+        this.centerY = this.y;
+        // ctx.ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle)
+        if (Math.floor(Math.random() + 0.5) == 0) {
+          this.radiusX = Math.floor(height/2);
+          this.radiusY = Math.floor(width/2);
+          this.rotation = Math.PI / 2;
+          this.startAngle = 0;
+          this.endAngle = 2 * Math.PI;
+        }
+        else {
+          this.radiusX = Math.floor(width/2);
+          this.radiusY = Math.floor(height/2);
+          this.rotation = Math.PI / 4;
+          this.startAngle = 0;
+          this.endAngle = 2 * Math.PI;
+        }
+        break;
+      case 'triangle':
+        points = this.centerTriangle(this.x, this.y, this.getOtherPoint(width, 1, this.x, this.y), this.getOtherPoint(width, 2, this.x, this.y));
+        this.oneX = points.oneX;
+        this.oneY = points.oneY;
+        this.twoX = points.twoX;
+        this.twoY = points.twoY;
+        this.thrX = points.thrX;
+        this.thrY = points.thrY;
+        break;
+      case 'line':
+        points = this.centerLine(this.x, this.y, this.getOtherPoint(width, null, this.x, this.y));
+        this.oneX = points.oneX;
+        this.oneY = points.oneY;
+        this.twoX = points.twoX;
+        this.twoY = points.twoY;
+        break;
+    } // end switch
+  } // end constructShapeInfo
+
+  // Function returns a number between the min and max given
+  getNumInRange(min,max) {
+    return Math.floor(Math.random() * (max - min) + min);
+  } //end getNumInRange
+
+  // Function returns offset points based off of a radius, centered on (offX,offY)
+  getOtherPoint(radius, random, offX, offY) {
+    var angle;
+    switch (random) {
+      case 1:
+        angle = 60 * Math.PI / 180;
+        break;
+      case 2:
+        angle = 120 * Math.PI / 180;
+        break;
+      default:
+        angle = Math.random() * Math.PI * 2;
+    }
+    return {
+      x: Math.floor(Math.cos(angle) * radius) + offX,
+      y: Math.floor(Math.sin(angle) * radius) + offY
+    };
+  } // end getOtherPoint
+
+  // Function returns 3 points for a triangle, centered around the mouse click
+  centerTriangle(oX, oY, other, otherO) {
+    var dY = Math.floor(oY - ((oY + other.y + otherO.y)/3)); // midway on the Y-plane from mouse click
+    return {
+      oneX: oX,
+      oneY: oY + dY,
+      twoX: other.x,
+      twoY: other.y + dY,
+      thrX: otherO.x,
+      thrY: otherO.y + dY
+    }
+  } // end centerTriangle
+
+  // Function returns 2 points for a line, centered around the mouse click
+  centerLine(oX, oY, other) {
+    var dX = Math.floor((oX - other.x)/2); // midway on the X-plane
+    var dY = Math.floor((oY - other.y)/2); // midway on the Y-plane
+    return {
+      oneX: oX + dX,
+      oneY: oY + dY,
+      twoX: other.x + dX,
+      twoY: other.y + dY
+    }
+  } // end centerLine
   
   // Return the point in the format "(x, y)"
   value() {
@@ -146,6 +285,81 @@ class Point {
     return this.y;
   } // end getY
 
+  // Returns shape of Point
+  getShape() {
+    return this.shape;
+  } // end getShape
+
+  // Returns color of Point
+  getColor() {
+    return this.color;
+  } // end getColor
+
+  // Returns Points shapes info
+  getShapeInfo() {
+    switch (this.shape) {
+      case 'rectangle':
+        return {
+          centerX: this.centerX,
+          centerY: this.centerY,
+          width: this.width,
+          height: this.height
+        }
+        break;
+      case 'square':
+        return {
+          centerX: this.centerX,
+          centerY: this.centerY,
+          width: this.width,
+          height: this.height
+        }
+        break;
+      case 'circle':
+        return {
+          radius: this.radius,
+          centerX: this.centerX,
+          centerY: this.centerY,
+          startAngle: this.startAngle,
+          endAngle: this.endAngle
+        }
+        break;
+      case 'oval':
+        return {
+          centerX: this.centerX,
+          centerY: this.centerY,
+          radiusX: this.radiusX,
+          radiusY: this.radiusY,
+          rotation: this.rotation,
+          startAngle: this.startAngle,
+          endAngle: this.endAngle
+        }
+        break;
+      case 'triangle':
+        return {
+          oneX: this.oneX,
+          oneY: this.oneY,
+          twoX: this.twoX,
+          twoY: this.twoY,
+          thrX: this.thrX,
+          thrY: this.thrY
+        }
+        break;
+      case 'line':
+        return {
+          oneX: this.oneX,
+          oneY: this.oneY,
+          twoX: this.twoX,
+          twoY: this.twoY
+        }
+        break;
+    } // end switch
+  } // end getShapeInfo
+
+  updateColor() {
+    if (Math.random() >= 0.8) {
+      this.color = colors[Math.floor(Math.random()*colors.length)];
+    }
+  }
 
   // Return a count for the number of Point objects
   static getCount() {
