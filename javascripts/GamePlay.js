@@ -6,11 +6,18 @@
 * "shape transformation game" on index.htm 
 ***********************************************/
 
+// Macros used to determine the operations of the code.
+const MAXPOINTS = 5; // maximum number of Point objects
+const UPDATECOLOR = 0.8; // The threshold to beat for a Point to change its color
+const UPDATEPOS = 0.75; // The threshold to beat for a Point to change its position
+const UPDATESHAPE = 0.9; // The threshold to beat for a Point to change its shape
+const SPEED = 250; // Number of milliseconds between intervals of the program
+
 var points = new Array();
 var shapes = new Array('rectangle', 'square', 'circle', 'oval', 'triangle', 'line');
 var colors = new Array('red', 'orange', 'yellow', 'green', 'cyan', 'blue', 'purple');
-var interval;
-const MAXPOINTS = 1;
+var interval; // Used to store the ID returned by setInterval()
+
 
 // This function exposes the "game" to the user
 function showGame() {
@@ -73,31 +80,27 @@ function wipeCanvasClean(canvas) {
 // This function stores a users click location as a point.
 function captureClick(e) {
   var canvas = document.getElementById("game-play");
-  if (Point.getCount() <= MAXPOINTS) {
-    if (Point.getCount() == 0) { wipeCanvasClean(canvas); }
-    points[Point.getCount()] = new Point(e.offsetX, e.offsetY, canvas);
+  if (Point.getCount() != MAXPOINTS) {
+    if (Point.getCount() < MAXPOINTS) {
+      if (Point.getCount() == 0) { wipeCanvasClean(canvas); }
+      points[Point.getCount()] = new Point(e.offsetX, e.offsetY, canvas);
+    }
+    if (Point.getCount() == MAXPOINTS) {
+      interval = setInterval(runOverPoints, SPEED, canvas);
+    }
   }
-  if (Point.getCount() == MAXPOINTS) {
+  else {
     e.stopPropagation();
-    interval = setInterval(runOverPoints, 500, canvas);
   }
 } // end captureClick
 
 // Function itterates over the `points` Array
 function runOverPoints(canvas) {
   var ctx = canvas.getContext("2d");
-  var rand = Math.random();
+  wipeCanvasClean(canvas);
   for(let point of points) {
     drawThings(point, canvas);
-    point.updateColor();
-  }
-  if (rand >= 0.75) {
-    if (Math.floor(Math.random() + 0.5) == 0) {
-      ctx.translate(Math.floor(canvas.width * 0.2), Math.floor(canvas.height * 0.2));
-    }
-    else {
-      ctx.translate(Math.floor(canvas.width * 0.2) * -1, Math.floor(canvas.height * 0.2) * -1);
-    }
+    point.maybeUpdate(canvas);
   }
 } //end runOverPoints
 
@@ -142,7 +145,6 @@ function drawThings(point, canvas){
       ctx.stroke(); 
       break;
   } // end switch
-  
 } // end drawThings
 
 
@@ -366,11 +368,48 @@ class Point {
     } // end switch
   } // end getShapeInfo
 
+  // Updates objects color property, maybe
   updateColor() {
-    if (Math.random() >= 0.8) {
+    if (Math.random() >= UPDATECOLOR) {
       this.color = colors[Math.floor(Math.random()*colors.length)];
     }
-  }
+  } // end updateColor
+
+  // Updates this.x & this.y for the point, maybe
+  updatePos(canvas) {
+    if (Math.random() >= UPDATEPOS) {
+      var tempX, tempY;
+      if (Math.floor(Math.random() + 0.5) == 0) {
+         tempX = this.x + Math.floor(canvas.width * 0.2); 
+         tempY = this.y + Math.floor(canvas.height * 0.2);
+      }
+      else {
+         tempX = this.x + Math.floor(canvas.width * 0.2) * -1; 
+         tempY = this.y + Math.floor(canvas.height * 0.2) * -1;
+      }
+      // Need to make sure the objects don't go outside of the canvas element
+      if (((tempX > 0) && (tempX < canvas.width)) && ((tempY > 0) && (tempY < canvas.height))) {
+        this.x = tempX;
+        this.y = tempY;
+        this.constructShapeInfo(canvas);
+      }
+    }
+  } // end updatePos
+
+  // Updates objects shape, maybe
+  updateShape(canvas) {
+    if (Math.random() >= UPDATESHAPE) {
+      this.shape = shapes[Math.floor(Math.random()*shapes.length)];
+      this.constructShapeInfo(canvas);
+    }
+  } // end updateShape
+
+  // Calls the other functions to see if the object properties will be updated
+  maybeUpdate(canvas) {
+    this.updateColor();
+    this.updatePos(canvas);
+    this.updateShape(canvas);
+  } // end maybeUpdate
 
   // Return a count for the number of Point objects
   static getCount() {
