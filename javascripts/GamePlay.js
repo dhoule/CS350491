@@ -7,6 +7,8 @@
 ***********************************************/
 
 var points = new Array();
+var shapes = new Array('rectangle', 'square', 'circle', 'oval', 'triangle', 'line');
+var colors = new Array('red', 'orange', 'yellow', 'green', 'cyan', 'blue', 'purple');
 
 // This function exposes the "game" to the user
 function showGame() {
@@ -14,6 +16,8 @@ function showGame() {
   buttonStart.style.display = "none";
   var canvas = document.getElementById("game-play");
   var menu = document.getElementById("game-controlls");
+  var controllButtons = '<input type="button" class="button" value="Refresh" onclick="refreshCanvas();">';
+  controllButtons += '<input type="button"  class="button" value="Exit" onclick="clearCanvas();">';
   // canvas.parentElement.style.width = "100%";
   canvas.style.display = "block"; 
   canvas.style.position = "relative"; 
@@ -23,7 +27,7 @@ function showGame() {
   gameInstructions(canvas.getContext("2d"));
   // canvas.addEventListener();
   menu.style.display = "block";
-  menu.innerHTML = '<input type="button" class="button" value="Refresh" onclick="refreshCanvas();"><input type="button"  class="button" value="Exit" onclick="clearCanvas();">'
+  menu.innerHTML = controllButtons;
 } // end showGame
 
 // This function resets the "game" to its original settings
@@ -56,21 +60,65 @@ function gameInstructions(ctx) {
 // function clear the canvas of everything
 function wipeCanvasClean(canvas) {
   var ctx = canvas.getContext("2d");
+  ctx.fillStyle = 'black';
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 } // end wipeCanvasClean
 
 // This function stores a users click location as a point.
 function captureClick(e) {
-  
+  var canvas = document.getElementById("game-play");
   if (Point.getCount() < 6) {
-    wipeCanvasClean(document.getElementById("game-play"));
-    points[Point.getCount()] = new Point(e.clientX, e.clientY);
+    wipeCanvasClean(canvas);
+    points[Point.getCount()] = new Point(e.offsetX, e.offsetY);
     // document.getElementById("pt1").innerHTML = point1.value(); 
   }
   if (Point.getCount() == 5) {
-    
+    for(let point of points) {
+      drawThings(point, canvas);
+    }
   }
 } // end captureClick
+
+// Function draws a pseudorandom shape in a pseudorandom color
+function drawThings(point, canvas){
+  var ctx = canvas.getContext("2d");
+  var shape = 'square';//shapes[Math.floor(Math.random()*shapes.length)];
+  var color = colors[Math.floor(Math.random()*colors.length)];
+  var width = getNumInRange(canvas.offsetWidth * (1/6),canvas.offsetWidth * (1/2));
+  var height = getNumInRange(canvas.offsetHeight * (1/6),canvas.offsetHeight * (1/2));
+  console.log('shape:',shape, 'color:',color, 'width:',width, 'height:',height, 'cWidth:',canvas.offsetWidth, 'cHeight:',canvas.offsetHeight,'Point:', point);
+  console.log('topX:',Math.floor(point.getX() - ( width / 2)), 'topY:',Math.floor(point.getY() - ( height / 2)));
+  ctx.fillStyle = color;
+  switch (shape) {
+    case 'rectangle':
+      ctx.fillRect(
+        Math.floor(point.getX() - ( width / 2)),Math.floor(point.getY() - ( height / 2)),width,height
+      );
+      break;
+    case 'square':
+      ctx.fillRect(
+        Math.floor(point.getX() - ( width / 2)),Math.floor(point.getY() - ( width / 2)),width,width
+      );
+      break;
+    case 'circle':
+      
+      break;
+    case 'oval':
+      
+      break;
+    case 'triangle':
+      
+      break;
+    case 'line':
+      
+      break;
+  } // end switch
+} // end drawThings
+
+// Function returns a number between the min and max given
+function getNumInRange(min,max) {
+  return Math.floor(Math.random() * (max - min) + min);
+} //end getNumInRange
 
 class Point {
   constructor(x, y) {
@@ -84,35 +132,32 @@ class Point {
   } // end constructor
   
   // Return the point in the format "(x, y)"
-  
   value() {
     return "(" + this.x + ", " + this.y + ")";
   } // end value
+
+  // Returns the x-value
+  getX() {
+    return this.x;
+  } // end getX
+
+  // Returns the y-value
+  getY() {
+    return this.y;
+  } // end getY
+
 
   // Return a count for the number of Point objects
   static getCount() {
     return (Point.count == undefined) ? 0 : Point.count;
   } // end getCount
 
-
+  // Resets the class element to 0
   static resetCount() {
     Point.count = undefined;
   } // end resetCount
 
-  // Return the distance between the two points or null if one 
-  // or more of the points is missing.
-  static distance(pt1, pt2) {
-    var xDist, yDist; // distances apart in the 2 dimensions var distance; // distance apart with direct connection
-    if (Point.count == 2) {
-      xDist = pt1.x - pt2.x;
-      yDist = pt1.y - pt2.y;
-      distance = Math.sqrt(xDist * xDist + yDist * yDist);
-    }
-    else {
-      distance = null; 
-    }
-    return distance; 
-  } // end distance
+  
 } // end Point class
 
 
