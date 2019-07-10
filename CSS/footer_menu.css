@@ -26,11 +26,6 @@
   color: black;
 }
 
-.navbar a.active {
-  background-color: #800020;
-  color: white;
-}
-
 .navbar .icon {
   display: none;
   background-color: black;  
