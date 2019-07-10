@@ -11,3 +11,13 @@ ul {
   list-style-type: square;
 }
 
+
+#game-play {
+  display:none;
+}
+
+#game-controls {
+  display:none;
+}
+
+input[type="button"] { cursor: pointer; }

@@ -6,8 +6,15 @@
     <meta name="description" content="This page will be incremented periodically through different projects. It will simulate a 'personal homepage'">
     <title>CS350/491 Project 3</title> 
     <link rel="stylesheet" href="./CSS/App.css">
+    <script src="javascripts/GamePlay.js"></script>
   </head>
-  <body>
+  <body onresize="resizeCanvas();">
+    <noscript> 
+      <p>
+        This web page uses JavaScript. For proper results,
+        you must use a web browser with JavaScript enabled. 
+      </p>
+    </noscript>
     <header>
       <h1>Houle, Daniel B.</h1>
       <hr>
@@ -23,6 +30,11 @@
         <p>I was born. I have lived for a few decades. One day, I will die.</p>
       </div>
     </header>
+    <hr>
+    <input type="button" class="button" id="game-play-show" 
+          value="Want to play a game?" onClick="showGame();">
+    <canvas id="game-play" onclick="captureClick(event);"></canvas>
+    <div id="game-controlls"></div>
     <hr>
     <div>
       <h3>Quotes</strong></h3>
@@ -57,16 +69,6 @@
           </div>
         </div>
       </p>
-      <div>
-        <h3>
-          Dog tax!!!
-        </h3>
-        <div>
-          <a href="">
-            <img src="./img/dog_tax.png" width="270" height="143" title="Stubborn butthead" alt="Stubborn_butthead">
-          </a>
-        </div>
-      </div>
     </div>
   </footer>
 </html>
