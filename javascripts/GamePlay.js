@@ -149,7 +149,9 @@ function drawThings(point, canvas){
 
 
 
-
+// Object holds the info for a single mouse click.
+// The object updates its own position, shape, & color IFF
+// the thresholds set by the macros are met or exceeded.
 class Point {
   
   constructor(x, y, canvas) {
@@ -160,7 +162,7 @@ class Point {
     this.constructShapeInfo(canvas);
     if (Point.count == undefined) {
       Point.count = 1; }
-    else if (Point.count < 6) { 
+    else if (Point.count < MAXPOINTS) { 
       Point.count += 1;
     }
   } // end constructor
