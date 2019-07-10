@@ -7,17 +7,6 @@ h3 {
   text-align: center;
 } 
 
-.feedback-footer-table {
-  display: table;
-  margin-bottom: 40px;
-}
-
-.feedback-footer-row { display: table-row;}
-
-.feedback-footer-row > * {
-  display: table-cell;
-} 
-
 form {
   /* Just to center the form on the page */
   margin: 0 auto;
