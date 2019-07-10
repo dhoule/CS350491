@@ -9,6 +9,11 @@
     <script src="javascripts/GamePlay.js"></script>
     <script src="javascripts/Footer.js"></script>
   </head>
+  <!-- 
+    The event listener needs to be here. I tried adding it after the canvas was displayed,
+    but that led to false positive clicks. If the canvas isn't displayed, the element is
+    effected, but the user doesn't notice it. 
+  -->
   <body onresize="resizeCanvas();">
     <noscript> 
       <p>
