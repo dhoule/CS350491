@@ -24,6 +24,7 @@ function showGame() {
   var buttonStart = document.getElementById("game-play-show");
   buttonStart.style.display = "none";
   var canvas = document.getElementById("game-play");
+  var ctx = canvas.getContext("2d");
   var menu = document.getElementById("game-controlls");
   var controllButtons = '<input type="button" class="button" value="Refresh" onclick="refreshCanvas();">';
   controllButtons += '<input type="button"  class="button" value="Exit" onclick="clearCanvas();">';
@@ -31,10 +32,12 @@ function showGame() {
   canvas.style.display = "inline-block"; 
   // canvas.style.position = "relative"; 
   canvas.style.margin = '0px';
+  ctx.canvas.width  = document.body.offsetWidth;//window.innerWidth;
+  ctx.canvas.height = document.body.offsetWidth;//window.innerHeight;
   // canvas.setAttribute("width",canvas.parentElement.style.width);  TODO
   // canvas.setAttribute("height",canvas.parentElement.style.height);  
   canvas.style.backgroundColor = "white";
-  gameInstructions(canvas.getContext("2d"));
+  gameInstructions(ctx);
   // canvas.addEventListener();
   menu.style.display = "block";
   menu.innerHTML = controllButtons;
