@@ -7,14 +7,3 @@ iframe {
 	display: block;
 	margin: 10px auto;
 }
-
-.media-footer-table {
-	display: table;
-	margin-bottom: 40px;
-}
-
-.media-footer-row { display: table-row;}
-
-.media-footer-row > * {
-	display: table-cell;
-}
