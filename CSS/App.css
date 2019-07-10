@@ -1,45 +1,48 @@
 /* 
-	Houle, Daniel B. 
-	CS350/491 Summer 2019 
+  Houle, Daniel B. 
+  CS350/491 Summer 2019 
 */
 
 @import "./main/header.css";
 @import "./main/body_section.css";
 @import "./main/footer.css";
+@import "footer_menu.css";
 
 * {
-	background-color: #800020;
+  background-color: #800020;
 }
 
-body{
-	width: 50%;
+body {
+  width: 50%;
   margin: 0px auto;
   color: white;
 }
 
-body img {padding :10px;}
+body img {padding: 10px;}
 
 h1 {
-	text-align: center;
+  text-align: center;
 } 
 
 hr {
-	width: 100%;
+  width: 100%;
 }
 
 div {
-	text-align: left;
+  text-align: left;
 }
 
 .button {
-	border-radius: 25px;
-	background-color: black; 
-	border: none;
-	color: white;
-	padding: 15px 32px;
-	text-align: center;
-	text-decoration: none;
-	display: inline-block;
-	font-size: 16px;
+  border-radius: 25px;
+  background-color: black; 
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
 }
+
+
 

@@ -7,17 +7,6 @@ h3 {
   text-align: center;
 } 
 
-.feedback-footer-table {
-  display: table;
-  margin-bottom: 40px;
-}
-
-.feedback-footer-row { display: table-row;}
-
-.feedback-footer-row > * {
-  display: table-cell;
-} 
-
 form {
   /* Just to center the form on the page */
   margin: 0 auto;
@@ -36,7 +25,7 @@ label {
   width: 90px;
 }
 
-input[type="text"]:focus, input[type="email"]:focus, textarea:focus {
+input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus, textarea:focus {
   /* To give a little highlight on active elements */
   border-color: #000;
 }
@@ -46,7 +35,7 @@ input[type="text"]:focus, input[type="email"]:focus, textarea:focus {
   color: black;
 }
 
-.feedback-form input[type="text"], input[type="email"], label, textarea {
+.feedback-form input[type="text"], input[type="email"], input[type="tel"], label, textarea {
   background-color: white;
   margin: 2px 0px;
 }
