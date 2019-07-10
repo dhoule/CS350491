@@ -17,44 +17,51 @@ var points = new Array();
 var shapes = new Array('rectangle', 'square', 'circle', 'oval', 'triangle', 'line');
 var colors = new Array('red', 'orange', 'yellow', 'green', 'cyan', 'blue', 'purple');
 var interval; // Used to store the ID returned by setInterval()
-var state = "stopped"; // Used to keep the state of the canvas
+/* 
+  Used to keep the state of the canvas
+  hidden  - not displayed
+  stopped - shown but not running
+  running - Point objects are being displayed
+*/
+var state = "hidden"; 
 
 // This function exposes the "game" to the user
 function showGame() {
+  state = "stopped";
   var buttonStart = document.getElementById("game-play-show");
   buttonStart.style.display = "none";
   var canvas = document.getElementById("game-play");
   var ctx = canvas.getContext("2d");
   var menu = document.getElementById("game-controlls");
+  // Sets up the inner HTML for the canvas control buttons
   var controllButtons = '<input type="button" class="button" value="Refresh" onclick="refreshCanvas();">';
   controllButtons += '<input type="button"  class="button" value="Exit" onclick="clearCanvas();">';
-  // canvas.parentElement.style.width = "100%";
+  
   canvas.style.display = "inline-block"; 
-  // canvas.style.position = "relative"; 
   canvas.style.margin = '0px';
-  ctx.canvas.width  = document.body.offsetWidth;//window.innerWidth;
-  ctx.canvas.height = document.body.offsetWidth;//window.innerHeight;
-  // canvas.setAttribute("width",canvas.parentElement.style.width);  TODO
-  // canvas.setAttribute("height",canvas.parentElement.style.height);  
+  // Sizes canvas to body elements width
+  ctx.canvas.width  = document.body.offsetWidth;
+  ctx.canvas.height = document.body.offsetWidth;
   canvas.style.backgroundColor = "white";
   gameInstructions(ctx);
-  // canvas.addEventListener();
   menu.style.display = "block";
   menu.innerHTML = controllButtons;
 } // end showGame
 
 // Resizes canvas element when the body element is resized
 function resizeCanvas() {
-  var ctx = document.getElementById("game-play").getContext("2d");
-  ctx.canvas.width  = document.body.offsetWidth;
-  ctx.canvas.height = document.body.offsetWidth;
-  if (state == "running") {
-    // Need to make sure the points are within the canvas
-    for(let point of points) { point.updatePos(ctx.canvas, true); }
-  }
-  else if (state == "stopped") {
-    // run a basic reset on the canvas
-    refreshCanvas();
+  if (state != "hidden") {
+    var ctx = document.getElementById("game-play").getContext("2d");
+    ctx.canvas.width  = document.body.offsetWidth;
+    ctx.canvas.height = document.body.offsetWidth;
+    if (state == "running") {
+      // Need to make sure the points are within the canvas
+      for(let point of points) { point.updatePos(ctx.canvas, true); }
+    }
+    else if (state == "stopped") {
+      // run a basic reset on the canvas
+      refreshCanvas();
+    }
   }
 } // end resizeCanvas
 
@@ -71,9 +78,11 @@ function refreshCanvas() {
   Point.resetCount();
 } // end refreshCanvas
 
-// This function resets the "game" to its original settings,
-// hides everything, and brings the button "game-play-show"
-// back into view.
+/* 
+  This function resets the "game" to its original settings,
+  hides everything, and brings the button "game-play-show"
+  back into view.
+*/
 function clearCanvas() {
   refreshCanvas();
   var buttonStart = document.getElementById("game-play-show");
@@ -84,12 +93,12 @@ function clearCanvas() {
   menu.style.display = "none";
 } // end clearCanvas
 
-// function merely returns the string that informs the user what to do
+// function merely displays the string that informs the user what to do
 function gameInstructions(ctx) {
   ctx.fillText("Please click on 5 arbitrary spots within this box to begin", 5, 10);
 } // end gameInstructions
 
-// function clear the canvas of everything
+// function clears the canvas of everything
 function wipeCanvasClean(canvas) {
   var ctx = canvas.getContext("2d");
   ctx.fillStyle = 'black';
@@ -99,8 +108,9 @@ function wipeCanvasClean(canvas) {
 
 // This function stores a users click location as a point.
 function captureClick(e) {
-  var canvas = document.getElementById("game-play");
   if (Point.getCount() != MAXPOINTS) {
+    // Only need this variable to actually do stuff
+    var canvas = document.getElementById("game-play");
     if (Point.getCount() < MAXPOINTS) {
       if (Point.getCount() == 0) { wipeCanvasClean(canvas); }
       points[Point.getCount()] = new Point(e.offsetX, e.offsetY, canvas);
@@ -111,6 +121,7 @@ function captureClick(e) {
     }
   }
   else {
+    // If MAXPOINTS has been reached, prevent any more event processes
     e.stopPropagation();
   }
 } // end captureClick
@@ -118,6 +129,8 @@ function captureClick(e) {
 // Function itterates over the `points` Array
 function runOverPoints(canvas) {
   var ctx = canvas.getContext("2d");
+  // Before new things can be drawn, the canvas must be cleared
+  // or else the shapes with just build on top of each other
   wipeCanvasClean(canvas);
   for(let point of points) {
     drawThings(point, canvas);
@@ -125,7 +138,7 @@ function runOverPoints(canvas) {
   }
 } //end runOverPoints
 
-// Function draws a pseudorandom shape in a pseudorandom color
+// Function draws a Point objects shape
 function drawThings(point, canvas){
   var ctx = canvas.getContext("2d");
   var info = point.getShapeInfo();
@@ -170,14 +183,16 @@ function drawThings(point, canvas){
 
 
 
-// Object holds the info for a single mouse click.
-// The object updates its own position, shape, & color IFF
-// the thresholds set by the macros are met or exceeded.
+/* 
+  Object holds the info for a single mouse click.
+  The object updates its own position, shape, & color IFF
+  the thresholds set by the macros are met or exceeded.
+*/
 class Point {
   
   constructor(x, y, canvas) {
-    this.x = x; // mouse click
-    this.y = y; // mouse click
+    this.x = x; // mouse click that becomes center X of object
+    this.y = y; // mouse click that becomes center Y of object
     this.shape = shapes[Math.floor(Math.random()*shapes.length)];
     this.color = colors[Math.floor(Math.random()*colors.length)];
     this.constructShapeInfo(canvas);
@@ -188,7 +203,7 @@ class Point {
     }
   } // end constructor
 
-  // creates the shapes info
+  // creates/updates the shapes info
   constructShapeInfo(canvas) {
     var width = this.getNumInRange(canvas.offsetWidth/6,canvas.offsetWidth/2);
     var height = this.getNumInRange(canvas.offsetHeight/6,canvas.offsetHeight/2);
@@ -401,7 +416,7 @@ class Point {
       this.y = canvas.height * Math.random();
       this.constructShapeInfo(canvas);
     }
-    else if ((Math.random() >= UPDATEPOS) || force) {
+    else if (Math.random() >= UPDATEPOS) {
       var tempX, tempY;
       if (Math.floor(Math.random() + 0.5) == 0) {
          tempX = this.x + Math.floor(canvas.width * 0.2); 
