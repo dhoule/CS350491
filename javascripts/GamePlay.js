@@ -17,7 +17,7 @@ var points = new Array();
 var shapes = new Array('rectangle', 'square', 'circle', 'oval', 'triangle', 'line');
 var colors = new Array('red', 'orange', 'yellow', 'green', 'cyan', 'blue', 'purple');
 var interval; // Used to store the ID returned by setInterval()
-
+var state = "stopped"; // Used to keep the state of the canvas
 
 // This function exposes the "game" to the user
 function showGame() {
@@ -43,13 +43,30 @@ function showGame() {
   menu.innerHTML = controllButtons;
 } // end showGame
 
+// Resizes canvas element when the body element is resized
+function resizeCanvas() {
+  var ctx = document.getElementById("game-play").getContext("2d");
+  ctx.canvas.width  = document.body.offsetWidth;
+  ctx.canvas.height = document.body.offsetWidth;
+  if (state == "running") {
+    // Need to make sure the points are within the canvas
+    for(let point of points) { point.updatePos(ctx.canvas, true); }
+  }
+  else if (state == "stopped") {
+    // run a basic reset on the canvas
+    refreshCanvas();
+  }
+} // end resizeCanvas
+
 // This function resets the "game" to its original settings
 function refreshCanvas() {
+  state = "stopped";
   var canvas = document.getElementById("game-play");
   var ctx = canvas.getContext("2d");
   wipeCanvasClean(canvas);
   gameInstructions(ctx);
-  clearInterval(interval);
+  // It is possible for `interval` to be undefined
+  if (interval != undefined) { clearInterval(interval); }
   points.length = 0; // resets any & all references to the points Array
   Point.resetCount();
 } // end refreshCanvas
@@ -89,6 +106,7 @@ function captureClick(e) {
       points[Point.getCount()] = new Point(e.offsetX, e.offsetY, canvas);
     }
     if (Point.getCount() == MAXPOINTS) {
+      state = "running";
       interval = setInterval(runOverPoints, SPEED, canvas);
     }
   }
@@ -287,11 +305,6 @@ class Point {
       twoY: other.y + dY
     }
   } // end centerLine
-  
-  // Return the point in the format "(x, y)"
-  value() {
-    return "(" + this.x + ", " + this.y + ")";
-  } // end value
 
   // Returns the x-value
   getX() {
@@ -381,8 +394,14 @@ class Point {
   } // end updateColor
 
   // Updates this.x & this.y for the point, maybe
-  updatePos(canvas) {
-    if (Math.random() >= UPDATEPOS) {
+  updatePos(canvas, force=false) {
+    // Allow the ability to force a position update
+    if (force) {
+      this.x = canvas.width * Math.random();
+      this.y = canvas.height * Math.random();
+      this.constructShapeInfo(canvas);
+    }
+    else if ((Math.random() >= UPDATEPOS) || force) {
       var tempX, tempY;
       if (Math.floor(Math.random() + 0.5) == 0) {
          tempX = this.x + Math.floor(canvas.width * 0.2); 
@@ -392,7 +411,7 @@ class Point {
          tempX = this.x + Math.floor(canvas.width * 0.2) * -1; 
          tempY = this.y + Math.floor(canvas.height * 0.2) * -1;
       }
-      // Need to make sure the objects don't go outside of the canvas element
+      // Need to make sure the objects don't go outside of the canvas element. 
       if (((tempX > 0) && (tempX < canvas.width)) && ((tempY > 0) && (tempY < canvas.height))) {
         this.x = tempX;
         this.y = tempY;
