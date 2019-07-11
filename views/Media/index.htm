@@ -5,11 +5,11 @@
     <meta name="author" content="Houle, Daniel B."> 
     <meta name="description" content="This page contains a links to musuc videos">
     <title>Media Page - CS350/491 Project 3</title> 
-    <link rel="stylesheet" href="../CSS/App.css">
-    <link rel="stylesheet" href="../CSS/media/media.css">
-    <script src="../javascripts/Footer.js"></script>
+    <link rel="stylesheet" href="../../CSS/App.css">
+    <link rel="stylesheet" href="../../CSS/media/media.css">
+    <script src="../../javascripts/Footer.js"></script>
   </head>
-  <body>
+  <body onload="buildNavbarMenu(event, 'Media');">
     <header>
       <h1>Houle, Daniel B.</h1>
     </header>
@@ -22,13 +22,6 @@
   </body>
   <hr>
   <footer>
-    <div class="navbar" id="menuNavBar">
-      <a class="button" href="../index.htm">Main page</a>
-      <a class="button" href="../Schedule/schedule.htm">Weekly Schedule</a>
-      <a class="button" href="../StoryTime/story_time.htm">Lil' Story</a>
-      <a class="button" href="https://github.com/dhoule" target="_blank">GitHub Account</a>
-      <a class="button" href="../Feedback/feedback.htm">Feedback</a>
-      <a href="javascript:void(0);" style="font-size:15px;" class="icon" onclick="modifyNavbar()">&#9776;</a>
-    </div>
+    <div class="navbar" id="menuNavBar"></div>
   </footer>
 </html>
