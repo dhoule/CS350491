@@ -24,21 +24,21 @@
     <section>
       <h3>Comments and/or Suggestions</h3>
       <hr>
-      <form class="feedback-form">
+      <form class="feedback-form" method="POST">
         <label for="title-name">Title:</label>
-        <input type="text" id="title-name" placeholder="Optional"><br>
+        <input type="text" id="title-name" name="title-name" placeholder="Optional"><br>
         <label for="first-name">First Name:</label>
-        <input type="text" id="first-name" placeholder="Required" required minlength="1"
+        <input type="text" id="first-name" name="first-name"placeholder="Required" required minlength="1"
                 onfocusout="validateField(this.form.elements['first-name'], 'First Name');"><br>
         <label for="last-name">Last Name:</label>
-        <input type="text" id="last-name" placeholder="Required" required minlength="1"
+        <input type="text" id="last-name" name="last-name"placeholder="Required" required minlength="1"
                 onfocusout="validateField(this.form.elements['last-name'], 'Last Name');"><br>
         <label for="email">Email:</label>
-        <input type="email" id="email" placeholder="Required" required
+        <input type="email" id="email" name="email" placeholder="Required" required
                 onfocusout="validateField(this.form.elements['email']);"><br>
         <label for="phone">Phone Num:</label>
-        <input type="tel" id="phone" placeholder="Optional"
-                onfocusout="validateField(this.form.elements['phone']);" pattern="^[0-9]{3}\\-[0-9]{3}\\-[0-9]{4}$"><br>
+        <input type="tel" id="phone" name="phone" placeholder="Optional"
+                onfocusout="validateField(this.form.elements['phone']);" pattern="^[0-9]{3}-[0-9]{3}-[0-9]{4}$"><br>
         <label for="body-text">Message:</label><br>
         <textarea id="body-text" rows = "5" cols = "50" required minlength="1"
                 onfocusout="validateField(this.form.elements['body-text'], 'Message');"></textarea>
