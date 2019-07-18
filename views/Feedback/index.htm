@@ -24,7 +24,7 @@
     <section>
       <h3>Comments and/or Suggestions</h3>
       <hr>
-      <form class="feedback-form" method="POST">
+      <form id="feedback-form" class="feedback-form" method="POST" onsubmit="sendEmail(event);">
         <label for="title-name">Title:</label>
         <input type="text" id="title-name" name="title-name" placeholder="Optional"><br>
         <label for="first-name">First Name:</label>
@@ -40,11 +40,11 @@
         <input type="tel" id="phone" name="phone" placeholder="Optional"
                 onfocusout="validateField(this.form.elements['phone']);" pattern="^[0-9]{3}-[0-9]{3}-[0-9]{4}$"><br>
         <label for="body-text">Message:</label><br>
-        <textarea id="body-text" rows = "5" cols = "50" required minlength="1"
+        <textarea id="body-text" name="body-text" rows = "5" cols = "50" required minlength="1"
                 onfocusout="validateField(this.form.elements['body-text'], 'Message');"></textarea>
         <br>
         <br>
-        <input class="button" type="button" value="Send" onclick="sendEmail(this.form);">
+        <input class="button" type="submit" value="Send">
       </form>
     </section>
   </body>
