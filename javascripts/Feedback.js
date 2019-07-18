@@ -8,7 +8,9 @@
 
 // Function will be used to, eventually, start events to send an email to the user
 
-function sendEmail(form) {
+function sendEmail(event) {
+  event.preventDefault(); // this was suggested for manual submit and redirect
+  var form = document.getElementById("feedback-form");
   var title, firstName, lastName, email, comments; // Setting up the variables
   var collection = new Array(); // Holds messages to display to the user
   var text = ""; // Used to build all messages
@@ -47,11 +49,9 @@ function sendEmail(form) {
   else {
     text = "Thank you for your submition, " + title + " " + lastName + ".";
   }
-  text += "\n\nA confirmation email will be sent to you shortly."
-  
-  console.log(form.elements);
-  form.submit();
+  text += "\n\nYour information is being processed.\nA confirmation email should be sent to you shortly."
   alert(text);
+  form.submit();
 } // end sendEmail
 
 // Function makes sure the value of the required string fields are not empty
