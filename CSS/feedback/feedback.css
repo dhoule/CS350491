@@ -40,7 +40,7 @@ input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus, te
   margin: 2px 0px;
 }
 /* This is to keep the look-&-feel consistent through out */
-input[type="button"] { cursor: pointer; }
+.button { cursor: pointer; }
 
 
 
