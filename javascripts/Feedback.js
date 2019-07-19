@@ -8,7 +8,9 @@
 
 // Function will be used to, eventually, start events to send an email to the user
 
-function sendEmail(form) {
+function sendEmail(event) {
+  event.preventDefault(); // this was suggested for manual submit and redirect
+  var form = document.getElementById("feedback-form");
   var title, firstName, lastName, email, comments; // Setting up the variables
   var collection = new Array(); // Holds messages to display to the user
   var text = ""; // Used to build all messages
@@ -40,9 +42,6 @@ function sendEmail(form) {
   title = form.elements["title-name"].value;
   firstName = form.elements["first-name"].value;
   lastName = form.elements["last-name"].value;
-  email = form.elements["email"].value;
-  phone = form.elements['phone'].value;
-  comments = form.elements["body-text"].value;
 
   if (title === "") {
     text = "Thank you for your submition, " + firstName + " " + lastName + ".";
@@ -50,9 +49,9 @@ function sendEmail(form) {
   else {
     text = "Thank you for your submition, " + title + " " + lastName + ".";
   }
-  text += "\n\nA confirmation email will be sent to you shortly."
+  text += "\n\nYour information is being processed.\nA confirmation email should be sent to you shortly."
   alert(text);
-  return true;
+  form.submit();
 } // end sendEmail
 
 // Function makes sure the value of the required string fields are not empty
@@ -71,8 +70,10 @@ function validateField(dirty, field) {
     }
   }
   else {
-    alert(field + " is a required field");
-    return false;
+    if (!dirty.checkValidity()) {
+      alert(field + " is a required field");
+      return false;
+    }
   }
   return true;
 } // end validateField
