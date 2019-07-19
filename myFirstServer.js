@@ -132,8 +132,8 @@ function sendEmail(email, reference) {
     service: 'gmail',
     host: 'smtp.gmail.com',
     auth: {
-      user: 'cainecs350491@gmail.com',
-      pass: 'bullDAwg350491'
+      user: '',
+      pass: ''
     }
   });
 
