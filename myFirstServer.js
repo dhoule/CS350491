@@ -11,7 +11,8 @@ const fs = require('fs'); // For interacting with the file system
 const path = require('path'); // For working with file and directory paths
 const url = require('url'); // For URL resolution and parsing
 const qs = require('querystring'); // provides utilities for parsing and formatting URL query strings
-const ffv = require('./node_modules/feedbackformval');
+const ffv = require('./node_modules/feedbackformval'); // custom validator
+const nodemailer = require('nodemailer'); // module makes it easy to send emails from your computer
 // const nodemailer = require('nodemailer'); // The Nodemailer module makes it easy to send emails from your computer
 // can assign the appropriate MIME type to the requested resource based on its extension
 const mimeTypes = {
@@ -93,15 +94,18 @@ http.createServer(function (req, res) {
     req.on('end', function() {
       testValidity = ffv.validateForm(body);
       if (testValidity === true) {
-        
         // The form is fully valid
-        fs.appendFile('flatfileDB.txt', convertToString(qs.parse(body)), function(error){});
+        var ts = Date.now(); // Using a timestamp as a reference number
+        var parsed = qs.parse(body);
+        fs.appendFile('flatfileDB.txt', convertToString(parsed, ts), function(error){});
+        sendEmail(parsed['email'],ts);
         res.writeHead(301, {'Content-Type': 'text/plain', Location: '/'} );
         res.end();
       }
       else {
         // There are errors that need to be sent back to the client
-        res.writeHead(422, {'Content-Type': 'text/plain'} );
+        // res.writeHead(422, {'Content-Type': 'text/plain'} ); // TODO change this back
+        res.writeHead(301, {'Content-Type': 'text/plain', Location: '/'} );
         res.end(testValidity);
       }
     });
@@ -112,13 +116,57 @@ http.createServer(function (req, res) {
 
 
 // Function merely converts data from an object to a string.
-function convertToString(dirty) {
+function convertToString(dirty, ts) {
   var temp = "<--->\t";
   for (let dirt in dirty) {
     temp += dirt + ":\"" + dirty[dirt].replace(/"/g,'\\"') + "\", "
   }
-  temp += "created_at:" + Date() + "\t<--->\n";
+  temp += "reference_id:\"" + ts + "\", created_at:" + Date() + "\t<--->\n";
   return temp;
 } // end convertToString
+
+
+// Function is used to send confirmation email.
+function sendEmail(email, reference) {
+  var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    host: 'smtp.gmail.com',
+    auth: {
+      user: 'cainecs350491@gmail.com',
+      pass: 'bullDAwg350491'
+    }
+  });
+
+  var mailOptions = {
+    from: 'cainecs350491@gmail.com',
+    to: email,
+    subject: 'Confirmation email',
+    text: "Your information has been received.\nThank you, again, for your feedback.\nYour reference number for further emails is " + reference + "."
+  };
+
+  // This block is used to test the mailing server
+  /*
+    transporter.verify(function(error, success) {
+      if (error) {
+        console.log('************',error);
+      } 
+      else {
+        console.log('Server is ready to take our messages');
+      }
+    });
+  */
+
+  transporter.sendMail(mailOptions, function(error, info){
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
+  });
+} // end sendEmail
+
+
+
+
 
 
