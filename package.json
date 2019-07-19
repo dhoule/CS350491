@@ -1,0 +1,27 @@
+{
+  "name": "cs350_491",
+  "version": "1.0.0",
+  "description": "Class project",
+  "main": "myFirstServer.js",
+  "dependencies": {
+    "nodemailer": "^6.3.0",
+    "querystring": "^0.2.0"
+  },
+  "engines": {
+    "node": "10.16.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dhoule/CS350_491.git"
+  },
+  "author": "Houle, Daniel B.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dhoule/CS350_491/issues"
+  },
+  "homepage": "https://github.com/dhoule/CS350_491#readme"
+}
