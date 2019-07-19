@@ -31,6 +31,12 @@ const mimeTypes = {
   '.woff2': 'font/woff2'
 };
 
+// This block is used to determine the port to use on a foreign repo
+var port = process.env.PORT;
+if (port === null || port == "") {
+  port = 8080;
+}
+
 http.createServer(function (req, res) {
 
   if (req.method === 'GET') {
@@ -112,7 +118,7 @@ http.createServer(function (req, res) {
   }
 
 
-}).listen(8080);
+}).listen(port);
 
 
 // Function merely converts data from an object to a string.
