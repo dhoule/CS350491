@@ -132,13 +132,13 @@ function sendEmail(email, reference) {
     service: 'gmail',
     host: 'smtp.gmail.com',
     auth: {
-      user: 'cainecs350491@gmail.com',
-      pass: 'bullDAwg350491'
+      user: process.env.CS350491EMAILUSER,
+      pass: process.env.CS350491EMAILPASS
     }
   });
 
   var mailOptions = {
-    from: 'cainecs350491@gmail.com',
+    from: process.env.CS350491EMAILUSER,
     to: email,
     subject: 'Confirmation email',
     text: "Your information has been received.\nThank you, again, for your feedback.\nYour reference number for further emails is " + reference + "."
