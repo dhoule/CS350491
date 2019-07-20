@@ -8,7 +8,8 @@
     "querystring": "^0.2.0"
   },
   "engines": {
-    "node": "10.16.0"
+    "node": "10.16.0",
+    "npm": "6.9.0"
   },
   "devDependencies": {},
   "scripts": {
