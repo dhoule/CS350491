@@ -57,7 +57,11 @@ app.post('/views/Feedback/index.htm', function (req, res) {
       var ts = Date.now(); // Using a timestamp as a reference number
       var parsed = qs.parse(body);
       fs.appendFile('flatfileDB.txt', convertToString(parsed, ts), function(error){
-        console.log('Error writing to flatfileDB.txt file: ', error);
+        if (error) {
+          console.log('Error writing to flatfileDB.txt file: ', error);
+          throw error;
+        }
+        console.log('Writing to flatfileDB.txt file successful!');
       });
       sendEmail(parsed['email'],ts);
       res.writeHead(301, {'Content-Type': 'text/plain', Location: '/'} );
