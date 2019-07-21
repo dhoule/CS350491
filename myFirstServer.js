@@ -78,6 +78,7 @@ app.post('/views/Feedback/index.htm', function (req, res) {
   });
 });
 
+// This handles all GET requests
 app.get('*', function (req, res) {
   /* 
     This block merely skips over the call for the 
@@ -132,12 +133,10 @@ app.get('*', function (req, res) {
 
 // Function merely converts data from an object to a string.
 function convertToString(dirty, ts) {
-  var temp = "{\tid:\"" + uuidv1() + "\", ";
-  for (let dirt in dirty) {
-    temp += dirt + ":\"" + dirty[dirt].replace(/"/g,'\\"') + "\", "
-  }
-  temp += "reference_id:\"" + ts + "\", created_at:" + Date() + "\t}\n";
-  return temp;
+  dirty.id = uuidv1();
+  dirty.created_at = Date();
+  dirty.reference_id = ts;
+  return JSON.stringify(dirty);
 } // end convertToString
 
 
@@ -171,6 +170,7 @@ function sendEmail(email, reference) {
     });
   */
 
+  // Send the email and log the results
   transporter.sendMail(mailOptions, function(error, info){
     if (error) {
       console.log(error);
