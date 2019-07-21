@@ -71,3 +71,9 @@ Project 4 requirements:
    your Project 4. Search Google for “best free node.js hosting”, you will find a lot free hosting services and pick up 
    your favored one.
 ```
+
+
+
+Steps to push to Heroku:
+1. `heroku login` in CLI.
+1. `git push heroku master` in CLI.
