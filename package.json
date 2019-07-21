@@ -6,7 +6,8 @@
   "dependencies": {
     "express": "^4.17.1",
     "nodemailer": "^6.3.0",
-    "querystring": "^0.2.0"
+    "querystring": "^0.2.0",
+    "uuid": "^3.3.2"
   },
   "engines": {
     "node": "10.16.0",
