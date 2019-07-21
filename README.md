@@ -76,6 +76,12 @@ link to navigate into your project pages); pack all YOUR other source files (not
 and files) into a zip file. Upload the TWO files (start.html and a separate zip file) to the submission folder of 
 Project 4 at D2L.
 ```
+Project 4 Update:
+```
+Project 4 requires a full functioning version of Project 3 running on a node.js server. You will need to use Express.js 
+(as a server side application framework -- one of the four elements of the MEAN Stack) to include  static files such as 
+CSS and pictures for your node.js server to work with. 
+```
 
 
 Foreign repo: https://intense-springs-49070.herokuapp.com/
