@@ -70,6 +70,11 @@ Project 4 requirements:
 3. Host your project website on a real (public accessible) server (not your computer) so that I (and anyone) can visit 
    your Project 4. Search Google for “best free node.js hosting”, you will find a lot free hosting services and pick up 
    your favored one.
+Submission:
+prepare start.html file that includes the link (URL) to your Project 4 webpage at a real website (I will use this 
+link to navigate into your project pages); pack all YOUR other source files (not including any downloaded modules 
+and files) into a zip file. Upload the TWO files (start.html and a separate zip file) to the submission folder of 
+Project 4 at D2L.
 ```
 
 
