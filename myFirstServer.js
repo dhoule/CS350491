@@ -15,6 +15,7 @@ const url = require('url'); // For URL resolution and parsing
 const qs = require('querystring'); // provides utilities for parsing and formatting URL query strings
 const ffv = require('./node_modules/feedbackformval'); // custom validator
 const nodemailer = require('nodemailer'); // module makes it easy to send emails from your computer
+const uuidv1 = require('uuid/v1');
 // can assign the appropriate MIME type to the requested resource based on its extension
 const mimeTypes = {
   '.html': 'text/html',
@@ -61,7 +62,7 @@ app.post('/views/Feedback/index.htm', function (req, res) {
           console.log('Error writing to flatfileDB.txt file: ', error);
           throw error;
         }
-        console.log('Writing to flatfileDB.txt file successful!');
+        console.log('Wrote to flatfileDB.txt file successful!');
       });
       sendEmail(parsed['email'],ts);
       res.writeHead(301, {'Content-Type': 'text/plain', Location: '/'} );
@@ -130,11 +131,11 @@ app.get('*', function (req, res) {
 
 // Function merely converts data from an object to a string.
 function convertToString(dirty, ts) {
-  var temp = "<--->\t";
+  var temp = "{\tid:\"" + uuidv1() + "\", ";
   for (let dirt in dirty) {
     temp += dirt + ":\"" + dirty[dirt].replace(/"/g,'\\"') + "\", "
   }
-  temp += "reference_id:\"" + ts + "\", created_at:" + Date() + "\t<--->\n";
+  temp += "reference_id:\"" + ts + "\", created_at:" + Date() + "\t}\n";
   return temp;
 } // end convertToString
 
