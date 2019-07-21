@@ -59,3 +59,15 @@ Project 3 requirements:
   shapes transforming too fast for human vision to discern. Notice that I only made a very basic description of the 
   shape transformation game; it is up to you to tap your creativity and make the game a real fun.)
  ```
+
+Project 4 requirements:
+```
+1. Set up your own Node.js web server, and upload and link all your project files of Project 3 to your Node web server. 
+   Now you have both client side and server side; make sure both sides work and collaborate -- your project runs in a 
+   client/server manner (not simply a local html file presented in a web browser as before).
+2. Rework on the   (described in Project 2): upon submission, store the form data in a data file on the server, and send 
+   a real email “thank you” message to the user.
+3. Host your project website on a real (public accessible) server (not your computer) so that I (and anyone) can visit 
+   your Project 4. Search Google for “best free node.js hosting”, you will find a lot free hosting services and pick up 
+   your favored one.
+```
