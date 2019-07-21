@@ -34,6 +34,7 @@ const mimeTypes = {
 };
 
 var app = express();
+app.use(express.static('assets'));
 
 // This block is used to determine the port to use on a foreign repo
 var port = process.env.PORT || 8080;
