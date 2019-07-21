@@ -63,7 +63,7 @@ app.post('/views/Feedback/index.htm', function (req, res) {
           console.log('Error writing to flatfileDB.txt file: ', error);
           throw error;
         }
-        console.log('Wrote to flatfileDB.txt file successful!');
+        console.log('Wrote to flatfileDB.txt file successfully!');
       });
       sendEmail(parsed['email'],ts);
       res.writeHead(301, {'Content-Type': 'text/plain', Location: '/'} );
