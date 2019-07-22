@@ -72,16 +72,26 @@ app.post('/views/Feedback/index.htm', function (req, res) {
       // The form is fully valid
       var ts = Date.now(); // Using a timestamp as a reference number
       var parsed = qs.parse(body);
-      fs.appendFile('flatfileDB.txt', convertToString(parsed, ts), function(error){
-        if (error) {
-          console.log('Error writing to flatfileDB.txt file: ', error);
-          throw error;
-        }
-        console.log('Wrote to flatfileDB.txt file successfully!');
-      });
-      sendEmail(parsed['email'],ts);
-      res.writeHead(301, {'Content-Type': 'text/plain', Location: '/'} );
-      res.end();
+
+      // DeprecationWarning: collection.save is deprecated. Use insertOne, insertMany, updateOne, or updateMany instead. 
+      db.collection('feedbacks').insertOne(convertToString(parsed, ts), (err, result) => {
+        if (err) return console.log(err)
+
+        console.log('saved to database')
+        sendEmail(parsed['email'],ts);
+        res.writeHead(301, {'Content-Type': 'text/plain', Location: '/'} );
+        res.end();
+      })
+      // fs.appendFile('flatfileDB.txt', convertToString(parsed, ts), function(error){
+      //   if (error) {
+      //     console.log('Error writing to flatfileDB.txt file: ', error);
+      //     throw error;
+      //   }
+      //   console.log('Wrote to flatfileDB.txt file successfully!');
+      // });
+      // sendEmail(parsed['email'],ts);
+      // res.writeHead(301, {'Content-Type': 'text/plain', Location: '/'} );
+      // res.end();
     }
     else {
       // There are errors that need to be sent back to the client
@@ -147,10 +157,9 @@ app.get('*', function (req, res) {
 
 // Function merely converts data from an object to a string.
 function convertToString(dirty, ts) {
-  dirty.id = uuidv1();
   dirty.created_at = Date();
   dirty.reference_id = ts;
-  return JSON.stringify(dirty);
+  return dirty;
 } // end convertToString
 
 
