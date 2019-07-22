@@ -83,6 +83,20 @@ Project 4 requires a full functioning version of Project 3 running on a node.js 
 CSS and pictures for your node.js server to work with. 
 ```
 
+Project 5 requirements:
+```
+1. Set up MongoDB as an add-on to your Node.js server.
+2. Redo the server-side submission handling of the feedback form
+  a. use MongoDB instead of a JSON data file;
+  b. instead of sending a “Thank You” email, respond the user with a new (node dynamically generated) webpage containing message 
+    “Thank you for your feedback. You are my n-th honored guest who left a feedback” (here n is the count of guests/users recorded 
+    in your database.)
+  c. For bonus (up to 20 bonus points): when the same guest (e.g., identified by the same email address) resubmit a feedback, 
+    respond the guest with message (in a dynamically generated html page) “Thank you for revisiting. Your new feedback has been 
+    recorded.” (You must accordingly do so on the server-side, either replacing the previous feedback or recording the new feedback 
+    in addition.)
+```    
+
 
 Foreign repo: https://intense-springs-49070.herokuapp.com/
 
