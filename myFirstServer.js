@@ -16,6 +16,9 @@ const qs = require('querystring'); // provides utilities for parsing and formatt
 const ffv = require('./node_modules/feedbackformval'); // custom validator
 const nodemailer = require('nodemailer'); // module makes it easy to send emails from your computer
 const uuidv1 = require('uuid/v1');
+// const db = require('mongodb');
+// Used to create a database if it does not exist, and make a connection to it.
+const MongoClient = require('mongodb').MongoClient;
 // can assign the appropriate MIME type to the requested resource based on its extension
 const mimeTypes = {
   '.html': 'text/html',
@@ -33,6 +36,7 @@ const mimeTypes = {
   '.woff2': 'font/woff2'
 };
 
+
 var app = express();
 app.use(express.static('assets'));
 
@@ -40,6 +44,22 @@ app.use(express.static('assets'));
 var port = process.env.PORT || 8080;
 
 console.log('\n\n**********\nListening on port: ', port,'\n**********\n\n');
+
+// The port 27017 is specified by the MongoDB. TODO look this up for deployment to Heroku
+var dbUrl = "mongodb://localhost:27017/";
+
+console.log('\n\n**********\nAttempting to connect to DB at: ', dbUrl,'\n**********\n\n');
+
+MongoClient.connect(dbUrl, function(err, db) {
+  if (err) throw err;
+  var dbo = db.db("CS350_491DB");
+  console.log("Database created!");
+  dbo.createCollection("feedback", function(err, res) {
+    if (err) throw err;
+    console.log("Collection created!");
+    db.close();
+  });
+});
 
 http.createServer(app).listen(port);
 
