@@ -74,10 +74,8 @@ app.post('/views/Feedback/index.htm', function (req, res) {
       var ts = Date.now(); // Using a timestamp as a reference number
       var parsed = qs.parse(body);
 
-
-
       // DeprecationWarning: collection.save is deprecated. Use insertOne, insertMany, updateOne, or updateMany instead. 
-      db.collection('feedbacks').insertOne(convertToString(parsed, ts), (err, result) => {
+      db.collection('feedbacks').insertOne(addAttributes(parsed, ts), (err, result) => {
         if (err) { return console.log(err); }
 
         console.log('saved to database');
@@ -148,12 +146,12 @@ app.get('*', function (req, res) {
 });
 
 
-// Function merely converts data from an object to a string.
-function convertToString(dirty, ts) {
+// Function adds some attributes and and sanatizes them
+function addAttributes(dirty, ts) {
   dirty.created_at = Date();
   dirty.reference_id = ts;
   return dirty;
-} // end convertToString
+} // end addAttributes
 
 
 // Function is used to send confirmation email.
@@ -221,24 +219,37 @@ function createEmailBody(ct, reference, first, last, title) {
 // Used to create the body text depending on what is sent to it
 function bodyText(greeting, ct, reference) {
 
-  var temp = "<style type=\"text/css\">\n";
-  temp += "  <!-- I need to make some styling aspects -->\n";
-  temp += "  </style>\n";
-  temp += "  <container>\n";
-  temp += "    <spacer size=\"16\"></spacer>\n";
-  temp += "    <row>\n";
-  temp += "      <columns>\n";
-  temp += "        <h1>Hello, " + greeting +"</h1>\n";
-  temp += "        <p>Thank you, again, for your feedback.</p>\n";
-  temp += "        <p>Your information has been received.</p>\n";
-  temp += "        <p>You are honored guest number " + ct + ", who has left a feedback.</p>\n";
-  temp += "        <p>Your reference number for further emails is <strong>" + reference + "</strong>.</p>\n";
-  temp += "      </columns>\n";
-  temp += "    </row>\n";
-  temp += "  </container>\n";
+  var temp = "<container>\n";
+  temp += "  <spacer size=\"16\"></spacer>\n";
+  temp += "  <row>\n";
+  temp += "    <columns>\n";
+  temp += "      <h1>Hello, " + greeting +"</h1>\n";
+  temp += "      <p>Thank you, again, for your feedback.</p>\n";
+  temp += "      <p>Your information has been received.</p>\n";
+  temp += "      <p>You are the " + getOrdinalSuffix(ct) + " honored guest, who has left a feedback.</p>\n";
+  temp += "      <p>Your reference number for further emails is <strong>" + reference + "</strong>.</p>\n";
+  temp += "    </columns>\n";
+  temp += "  </row>\n";
+  temp += "</container>\n";
 
   return temp;
 } // end bodyText
+
+// Used to determine what suffix to add to the number
+function getOrdinalSuffix(i) {
+  var j = i % 10;
+  var k = i % 100;
+  if (j == 1 && k != 11) {
+    return i + "st";
+  }
+  if (j == 2 && k != 12) {
+    return i + "nd";
+  }
+  if (j == 3 && k != 13) {
+    return i + "rd";
+  }
+  return i + "th";
+} // end getOrdinalSuffix
 
 
 
