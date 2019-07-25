@@ -93,7 +93,7 @@ app.post('/views/Feedback/index.htm', function (req, res) {
       formM.save(function (err, result) {
         if (err) { return console.log(err); }
         console.log('Saved to database');
-        sendEmail(result['email'],result['first-name'],result['last-name'],result['title-name'],ts);
+        startEmailProcess(result['email'],result['first-name'],result['last-name'],result['title-name'],ts);
         res.writeHead(301, {'Content-Type': 'text/plain', Location: '/'} );
         res.end();
       });
@@ -168,9 +168,9 @@ function addAttributes(dirty, ts) {
 } // end addAttributes
 
 
-// Function is used to send confirmation email.
-function sendEmail(email, first, last, title, reference) {
-  
+// Function is used to start the confirmation email process.
+function startEmailProcess(email, first, last, title, reference) {
+  // Find out how many times the given email has shown up before
   var query = formModel.find({'email': email}).select("email created_at -_id");
   query.exec(
     function(err,results) {
@@ -186,82 +186,193 @@ function sendEmail(email, first, last, title, reference) {
         function(error,num) {
           if(error) { console.log(error); return error; }
 
-          var transporter = nodemailer.createTransport({
-            service: 'gmail',
-            host: 'smtp.gmail.com',
-            auth: {
-              user: process.env.CS350491EMAILUSER,
-              pass: process.env.CS350491EMAILPASS
-            }
-          });
-
-          var ct = (num.indexOf(email) == -1) ? (num.length + 1) : num.length;
-          /* 
-            This is just to check if the `email` value has been seen before. 
-            It's most likely not needed, as this code is called from within
-            the callback function of the insertion to the MongoDB.
-          */
-          // Need to determine what body text to use
-          var body = createEmailBody(ct, len, reference, first, last, title);
-
-          var mailOptions = {
-            from: process.env.CS350491EMAILUSER,
-            to: email,
-            subject: 'Confirmation email',
-            html: body
-          };
-          // This block is used to test the mailing server
-          /*
-            transporter.verify(function(error, success) {
-              if (error) {
-                console.log('************',error);
-              } 
-              else {
-                console.log('Server is ready to take our messages');
-              }
-            });
-          */
-
-          // Send the email and log the results
-          transporter.sendMail(mailOptions, function(error, info){
-            if (error) {
-              console.log(error);
-            } else {
-              console.log('Email sent: ' + info.response);
-            }
-          });
+          sendEmail(len, num, email, first, last, title, reference);
         }
       );
     }
   );
+} // end startEmailProcess
+
+// Function builds the info, starts at least, and send the email
+function sendEmail(len, num, email, first, last, title, reference) {
+  var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    host: 'smtp.gmail.com',
+    auth: {
+      user: process.env.CS350491EMAILUSER,
+      pass: process.env.CS350491EMAILPASS
+    }
+  });
+  /* 
+    This is just to check if the `email` value has been seen before. 
+    It's most likely not needed, as this code is called from within
+    the callback function of the insertion to the MongoDB.
+  */
+  var ct = (num.indexOf(email) == -1) ? (num.length + 1) : num.length;
+  
+  // Need to determine what body text to use
+  var body = createEmailBody(ct, len, reference, first, last, title);
+
+  var mailOptions = {
+    from: process.env.CS350491EMAILUSER,
+    to: email,
+    subject: 'Confirmation email',
+    html: body
+  };
+  // This block is used to test the mailing server
+  /*
+    transporter.verify(function(error, success) {
+      if (error) {
+        console.log('************',error);
+      } 
+      else {
+        console.log('Server is ready to take our messages');
+      }
+    });
+  */
+
+  // Send the email and log the results
+  transporter.sendMail(mailOptions, function(error, info){
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
+  });
 } // end sendEmail
 
 // Returns the body text of the email
 function createEmailBody(ct, len, reference, first, last, title) {
   var body = "";
   var greeting = (title == "") ? first + " " + last : title + " " + last;
-
-  return bodyText(greeting, ct, len, reference);
+  body += getHeadPart() + bodyText(greeting, ct, len, reference) + getBottomPart();
+  return body;
 } // end createEmailBody
+
+/* 
+  Function holds the HEAD section, and the start, of the email.
+  mso = Microsoft Office
+  Yes, I found this online, and have modified it to fit my needs.
+*/
+function getHeadPart() {
+  var   temp = "<html xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\">\n";
+  temp += "<head>\n";
+  temp += "  <!--[if gte mso 9]>\n";
+  temp += "  <xml>\n";
+  temp += "  <o:OfficeDocumentSettings>\n";
+  temp += "  <o:AllowPNG/>\n";
+  temp += "  <o:PixelsPerInch>96</o:PixelsPerInch>\n";
+  temp += "  </o:OfficeDocumentSettings>\n";
+  temp += "  </xml>\n";
+  temp += "  <![endif]-->\n";
+  temp += "  <title>Feedback Confirmation</title>\n";
+  temp += "  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n";
+  temp += "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0 \">\n";
+  temp += "  <meta name=\"format-detection\" content=\"telephone=no\">\n";
+  temp += "  <!--[if !mso]><!-->\n";
+  temp += "  <link href=\"https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800\" rel=\"stylesheet\">\n";
+  temp += "  <!--<![endif]-->\n";
+  temp += "  <style type=\"text/css\">\n";
+  temp += "    body {\n";
+  temp += "      margin: 0 !important;\n";
+  temp += "      padding: 0 !important;\n";
+  temp += "      -webkit-text-size-adjust: 100% !important;\n";
+  temp += "      -ms-text-size-adjust: 100% !important;\n";
+  temp += "      -webkit-font-smoothing: antialiased !important;\n";
+  temp += "    }\n";
+  temp += "    table {\n";
+  temp += "      border-collapse: collapse;\n";
+  temp += "      mso-table-lspace: 0px;\n";
+  temp += "      mso-table-rspace: 0px;\n";
+  temp += "    }\n";
+  temp += "    td, span {\n";
+  temp += "      border-collapse: collapse;\n";
+  temp += "      mso-line-height-rule: exactly;\n";
+  temp += "    }\n";
+  temp += "    @media only screen and (min-width:481px) and (max-width:699px) {\n";
+  temp += "      .em_main_table {\n";
+  temp += "        width: 100% !important;\n";
+  temp += "      }\n";
+  temp += "      .em_hide {\n";
+  temp += "        display: none !important;\n";
+  temp += "      }\n";
+  temp += "      .em_padd {\n";
+  temp += "        padding: 20px 10px !important;\n";
+  temp += "      }\n";
+  temp += "    }\n";
+  temp += "    @media screen and (max-width: 480px) {\n";
+  temp += "      .em_main_table {\n";
+  temp += "        width: 100% !important;\n";
+  temp += "      }\n";
+  temp += "      .em_hide {\n";
+  temp += "        display: none !important;\n";
+  temp += "      }\n";
+  temp += "      .em_padd {\n";
+  temp += "        padding: 20px 10px !important;\n";
+  temp += "      }\n";
+  temp += "      u + .em_body .em_full_wrap {\n";
+  temp += "        width: 100% !important;\n";
+  temp += "        width: 100vw !important;\n";
+  temp += "      }\n";
+  temp += "    }\n";
+  temp += "  </style>\n";
+  temp += "</head>\n";
+  temp += "<body class=\"em_body\" style=\"margin:0px; padding:0px;\" bgcolor=\"#800020\">\n";
+  temp += "  <table class=\"em_full_wrap\" valign=\"top\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" bgcolor=\"#800020\" align=\"left\">\n";
+  temp += "    <tbody>\n";
+  temp += "      <tr>\n";
+  temp += "        <td valign=\"top\" align=\"left\">\n";
+  temp += "          <table class=\"em_main_table\" style=\"width:700px;\" width=\"700\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" align=\"left\">\n";
+  temp += "            <tbody>\n";
+  temp += "              <tr>\n";
+  temp += "                <td style=\"font-family:'Open Sans', Arial, sans-serif; padding:15px; color:white;\" class=\"em_padd\" valign=\"top\" bgcolor=\"#800020\" align=\"left\">\n";
+  return temp;
+} // end getHeadPart
 
 // Used to create the body text depending on what is sent to it
 function bodyText(greeting, ct, len, reference) {
-
-  var temp = "<container>\n";
-  temp += "  <spacer size=\"16\"></spacer>\n";
-  temp += "  <row>\n";
-  temp += "    <columns>\n";
-  temp += "      <h1>Hello, " + greeting +"</h1>\n";
-  temp += (len < 1) ? "      <p>Thank you, again, for your feedback.</p>\n" : "      <p>Thank you for revisiting.</p>\n";
-  temp += "      <p>Your information has been received.</p>\n";
-  temp += "      <p>You are the " + getOrdinalSuffix(ct) + " honored guest, who has left a feedback.</p>\n";
-  temp += "      <p>Your reference number for further emails is <strong>" + reference + "</strong>.</p>\n";
-  temp += "    </columns>\n";
-  temp += "  </row>\n";
-  temp += "</container>\n";
+  var   temp = "                  <h1>Hello, " + greeting +"</h1>\n";
+  temp += "                </td>\n";
+  temp += "              </tr>\n";
+  temp += "              <tr>\n";
+  temp += "                <td style=\"color:white;\" class=\"em_padd\" valign=\"top\" bgcolor=\"#800020\" align=\"left\">\n";
+  temp += (len < 1) ? "                  Thank you, again, for your feedback.\n" : "                  Thank you for revisiting.\n";
+  temp += "                </td>\n";
+  temp += "              </tr>\n";
+  temp += "              <tr>\n";
+  temp += "                <td style=\"color:white;\" class=\"em_padd\" valign=\"top\" bgcolor=\"#800020\" align=\"left\">\n";
+  temp += "                  Your information has been received.\n";
+  temp += "                </td>\n";
+  temp += "              </tr>\n";
+  temp += "              <tr>\n";
+  temp += "                <td style=\"color:white;\" class=\"em_padd\" valign=\"top\" bgcolor=\"#800020\" align=\"left\">\n";
+  temp += "                  You are the " + getOrdinalSuffix(ct) + " honored guest, who has left a feedback.\n";
+  temp += "                </td>\n";
+  temp += "              </tr>\n";
+  temp += "              <tr>\n";
+  temp += "                <td style=\"color:white;\" class=\"em_padd\" valign=\"top\" bgcolor=\"#800020\" align=\"left\">\n";
+  temp += "                  Your reference number for further emails is <strong>" + reference + "</strong>.\n";
+  temp += "                </td>\n";
+  temp += "              </tr>\n";
 
   return temp;
 } // end bodyText
+
+// This is the bottom part of the email
+function getBottomPart() {
+  var temp = "            </tbody>\n";
+  temp += "          </table>\n";
+  temp += "        </td>\n";
+  temp += "      </tr>\n";
+  temp += "    </tbody>\n";
+  temp += "  </table>\n";
+  temp += "  <div class=\"em_hide\" style=\"white-space: nowrap; display: none; font-size:0px; line-height:0px;\">\n";
+  temp += "    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;\n";
+  temp += "  </div>\n";
+  temp += "</body>\n";
+  temp += "</html>\n";
+  return temp;
+} // end getBottomPart
 
 // Used to determine what suffix to add to the number
 function getOrdinalSuffix(i) {
