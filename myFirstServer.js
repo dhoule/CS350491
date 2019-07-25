@@ -182,7 +182,6 @@ function sendEmail(email, first, last, title, reference) {
         the MongoDB, even if the user is new, there will be ONE entry.
       */
       var len = results.length - 1;
-
       formModel.find().distinct("email",
         function(error,num) {
           if(error) { console.log(error); return error; }
@@ -253,7 +252,7 @@ function bodyText(greeting, ct, len, reference) {
   temp += "  <row>\n";
   temp += "    <columns>\n";
   temp += "      <h1>Hello, " + greeting +"</h1>\n";
-  temp += (len <= 1) ? "      <p>Thank you, again, for your feedback.</p>\n" : "      <p>Thank you for revisiting.</p>\n";
+  temp += (len < 1) ? "      <p>Thank you, again, for your feedback.</p>\n" : "      <p>Thank you for revisiting.</p>\n";
   temp += "      <p>Your information has been received.</p>\n";
   temp += "      <p>You are the " + getOrdinalSuffix(ct) + " honored guest, who has left a feedback.</p>\n";
   temp += "      <p>Your reference number for further emails is <strong>" + reference + "</strong>.</p>\n";
