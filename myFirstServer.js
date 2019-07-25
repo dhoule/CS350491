@@ -97,15 +97,6 @@ app.post('/views/Feedback/index.htm', function (req, res) {
         res.writeHead(301, {'Content-Type': 'text/plain', Location: '/'} );
         res.end();
       });
-      // DeprecationWarning: collection.save is deprecated. Use insertOne, insertMany, updateOne, or updateMany instead. 
-      // db.collection('feedbacks').insertOne(addAttributes(parsed, ts), (err, result) => {
-      //   if (err) { return console.log(err); }
-
-      //   console.log('saved to database');
-      //   sendEmail(parsed['email'],parsed['first-name'],parsed['last-name'],parsed['title-name'],ts);
-      //   res.writeHead(301, {'Content-Type': 'text/plain', Location: '/'} );
-      //   res.end();
-      // });
     }
     else {
       // There are errors that need to be sent back to the client
@@ -180,75 +171,89 @@ function addAttributes(dirty, ts) {
 // Function is used to send confirmation email.
 function sendEmail(email, first, last, title, reference) {
   
-  formModel.find().distinct("email",
-  // db.collection('feedbacks').distinct("email",{},
-    function(err,num) {
+  var query = formModel.find({'email': email}).select("email created_at -_id");
+  query.exec(
+    function(err,results) {
       if(err) { console.log(err); return err; }
-      var transporter = nodemailer.createTransport({
-        service: 'gmail',
-        host: 'smtp.gmail.com',
-        auth: {
-          user: process.env.CS350491EMAILUSER,
-          pass: process.env.CS350491EMAILPASS
-        }
-      });
-
+      
       /* 
-        This is just to check if the `email` value has been seen before. 
-        It's most likely not needed, as this code is called from within
-        the callback function of the insertion to the MongoDB.
+        The array is to contain only the emails of the those that the user submitted.
+        Since this is called from within the callback function of the insertion to 
+        the MongoDB, even if the user is new, there will be ONE entry.
       */
-      var ct = (num.indexOf(email) == -1) ? (num.length + 1): num.length;
-      // Need to determine what body text to use
-      var body = createEmailBody(ct, reference, first, last, title);
+      var len = results.length - 1;
 
-      var mailOptions = {
-        from: process.env.CS350491EMAILUSER,
-        to: email,
-        subject: 'Confirmation email',
-        html: body
-      };
-      // This block is used to test the mailing server
-      /*
-        transporter.verify(function(error, success) {
-          if (error) {
-            console.log('************',error);
-          } 
-          else {
-            console.log('Server is ready to take our messages');
-          }
-        });
-      */
+      formModel.find().distinct("email",
+        function(error,num) {
+          if(error) { console.log(error); return error; }
 
-      // Send the email and log the results
-      transporter.sendMail(mailOptions, function(error, info){
-        if (error) {
-          console.log(error);
-        } else {
-          console.log('Email sent: ' + info.response);
+          var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            host: 'smtp.gmail.com',
+            auth: {
+              user: process.env.CS350491EMAILUSER,
+              pass: process.env.CS350491EMAILPASS
+            }
+          });
+
+          var ct = (num.indexOf(email) == -1) ? (num.length + 1) : num.length;
+          /* 
+            This is just to check if the `email` value has been seen before. 
+            It's most likely not needed, as this code is called from within
+            the callback function of the insertion to the MongoDB.
+          */
+          // Need to determine what body text to use
+          var body = createEmailBody(ct, len, reference, first, last, title);
+
+          var mailOptions = {
+            from: process.env.CS350491EMAILUSER,
+            to: email,
+            subject: 'Confirmation email',
+            html: body
+          };
+          // This block is used to test the mailing server
+          /*
+            transporter.verify(function(error, success) {
+              if (error) {
+                console.log('************',error);
+              } 
+              else {
+                console.log('Server is ready to take our messages');
+              }
+            });
+          */
+
+          // Send the email and log the results
+          transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+          });
         }
-      });
+      );
     }
   );
 } // end sendEmail
 
 // Returns the body text of the email
-function createEmailBody(ct, reference, first, last, title) {
+function createEmailBody(ct, len, reference, first, last, title) {
   var body = "";
   var greeting = (title == "") ? first + " " + last : title + " " + last;
 
-  return bodyText(greeting, ct, reference);
+  return bodyText(greeting, ct, len, reference);
 } // end createEmailBody
 
 // Used to create the body text depending on what is sent to it
-function bodyText(greeting, ct, reference) {
+function bodyText(greeting, ct, len, reference) {
 
   var temp = "<container>\n";
   temp += "  <spacer size=\"16\"></spacer>\n";
   temp += "  <row>\n";
   temp += "    <columns>\n";
   temp += "      <h1>Hello, " + greeting +"</h1>\n";
-  temp += "      <p>Thank you, again, for your feedback.</p>\n";
+  temp += (len <= 1) ? "      <p>Thank you, again, for your feedback.</p>\n" : "      <p>Thank you for revisiting.</p>\n";
   temp += "      <p>Your information has been received.</p>\n";
   temp += "      <p>You are the " + getOrdinalSuffix(ct) + " honored guest, who has left a feedback.</p>\n";
   temp += "      <p>Your reference number for further emails is <strong>" + reference + "</strong>.</p>\n";
