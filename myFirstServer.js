@@ -16,6 +16,8 @@ const qs = require('querystring'); // provides utilities for parsing and formatt
 const ffv = require('./node_modules/feedbackformval'); // custom validator
 const nodemailer = require('nodemailer'); // module makes it easy to send emails from your computer
 const uuidv1 = require('uuid/v1');
+// Used to create a database if it does not exist, and make a connection to it.
+const mongoose = require('mongoose');
 // can assign the appropriate MIME type to the requested resource based on its extension
 const mimeTypes = {
   '.html': 'text/html',
@@ -33,20 +35,48 @@ const mimeTypes = {
   '.woff2': 'font/woff2'
 };
 
+
 var app = express();
 app.use(express.static('assets'));
 
 // This block is used to determine the port to use on a foreign repo
 var port = process.env.PORT || 8080;
 
-console.log('\n\n**********\nListening on port: ', port,'\n**********\n\n');
+// The port 27017 is specified by the MongoDB. TODO look this up for deployment to Heroku
+var dbUrl = process.env.MONGODB_URI || "mongodb://localhost:27017/CS350_491DB";
 
-http.createServer(app).listen(port);
+console.log('\n\n**********\nAttempting to connect to DB at: ', dbUrl,'\n**********\n\n');
+var formModel;
+var db = mongoose.connect(dbUrl, {useNewUrlParser: true}, function (err, client) {
+  if (err) throw err;
+  console.log("Database created!");
+
+  // Need to set up some schema
+  var formSchema = new mongoose.Schema({
+    email: String,
+    'first-name': String,
+    'last-name': String,
+    'title-name': String,
+    'body-text': String,
+    phone: String,
+    created_at: Date,
+    reference_id: String
+  });
+  formModel = mongoose.model('Form', formSchema);
+  // want to start the server only when the database is connected
+  app.listen(port, function() {
+    console.log('\n\n**********\nlistening on port: ', port,'\n**********\n\n');
+  });
+});
+
+
+
 
 // This is the only POST route that exists
 app.post('/views/Feedback/index.htm', function (req, res) {
   var body = '';
   var testValidity = false; // never trust the client side
+  
   // receiving data
   req.on('data', function(chunk) {
     body += chunk.toString();
@@ -58,16 +88,24 @@ app.post('/views/Feedback/index.htm', function (req, res) {
       // The form is fully valid
       var ts = Date.now(); // Using a timestamp as a reference number
       var parsed = qs.parse(body);
-      fs.appendFile('flatfileDB.txt', convertToString(parsed, ts), function(error){
-        if (error) {
-          console.log('Error writing to flatfileDB.txt file: ', error);
-          throw error;
-        }
-        console.log('Wrote to flatfileDB.txt file successfully!');
+
+      var formM = new formModel(addAttributes(parsed, ts));
+      formM.save(function (err, result) {
+        if (err) { return console.log(err); }
+        console.log('Saved to database');
+        sendEmail(result['email'],result['first-name'],result['last-name'],result['title-name'],ts);
+        res.writeHead(301, {'Content-Type': 'text/plain', Location: '/'} );
+        res.end();
       });
-      sendEmail(parsed['email'],ts);
-      res.writeHead(301, {'Content-Type': 'text/plain', Location: '/'} );
-      res.end();
+      // DeprecationWarning: collection.save is deprecated. Use insertOne, insertMany, updateOne, or updateMany instead. 
+      // db.collection('feedbacks').insertOne(addAttributes(parsed, ts), (err, result) => {
+      //   if (err) { return console.log(err); }
+
+      //   console.log('saved to database');
+      //   sendEmail(parsed['email'],parsed['first-name'],parsed['last-name'],parsed['title-name'],ts);
+      //   res.writeHead(301, {'Content-Type': 'text/plain', Location: '/'} );
+      //   res.end();
+      // });
     }
     else {
       // There are errors that need to be sent back to the client
@@ -131,56 +169,111 @@ app.get('*', function (req, res) {
 });
 
 
-// Function merely converts data from an object to a string.
-function convertToString(dirty, ts) {
-  dirty.id = uuidv1();
+// Function adds some attributes and and sanatizes them
+function addAttributes(dirty, ts) {
   dirty.created_at = Date();
   dirty.reference_id = ts;
-  return JSON.stringify(dirty);
-} // end convertToString
+  return dirty;
+} // end addAttributes
 
 
 // Function is used to send confirmation email.
-function sendEmail(email, reference) {
-  var transporter = nodemailer.createTransport({
-    service: 'gmail',
-    host: 'smtp.gmail.com',
-    auth: {
-      user: process.env.CS350491EMAILUSER,
-      pass: process.env.CS350491EMAILPASS
+function sendEmail(email, first, last, title, reference) {
+  
+  formModel.find().distinct("email",
+  // db.collection('feedbacks').distinct("email",{},
+    function(err,num) {
+      if(err) { console.log(err); return err; }
+      var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        host: 'smtp.gmail.com',
+        auth: {
+          user: process.env.CS350491EMAILUSER,
+          pass: process.env.CS350491EMAILPASS
+        }
+      });
+
+      /* 
+        This is just to check if the `email` value has been seen before. 
+        It's most likely not needed, as this code is called from within
+        the callback function of the insertion to the MongoDB.
+      */
+      var ct = (num.indexOf(email) == -1) ? (num.length + 1): num.length;
+      // Need to determine what body text to use
+      var body = createEmailBody(ct, reference, first, last, title);
+
+      var mailOptions = {
+        from: process.env.CS350491EMAILUSER,
+        to: email,
+        subject: 'Confirmation email',
+        html: body
+      };
+      // This block is used to test the mailing server
+      /*
+        transporter.verify(function(error, success) {
+          if (error) {
+            console.log('************',error);
+          } 
+          else {
+            console.log('Server is ready to take our messages');
+          }
+        });
+      */
+
+      // Send the email and log the results
+      transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
     }
-  });
-
-  var mailOptions = {
-    from: process.env.CS350491EMAILUSER,
-    to: email,
-    subject: 'Confirmation email',
-    text: "Your information has been received.\nThank you, again, for your feedback.\nYour reference number for further emails is " + reference + "."
-  };
-
-  // This block is used to test the mailing server
-  /*
-    transporter.verify(function(error, success) {
-      if (error) {
-        console.log('************',error);
-      } 
-      else {
-        console.log('Server is ready to take our messages');
-      }
-    });
-  */
-
-  // Send the email and log the results
-  transporter.sendMail(mailOptions, function(error, info){
-    if (error) {
-      console.log(error);
-    } else {
-      console.log('Email sent: ' + info.response);
-    }
-  });
+  );
 } // end sendEmail
 
+// Returns the body text of the email
+function createEmailBody(ct, reference, first, last, title) {
+  var body = "";
+  var greeting = (title == "") ? first + " " + last : title + " " + last;
 
+  return bodyText(greeting, ct, reference);
+} // end createEmailBody
+
+// Used to create the body text depending on what is sent to it
+function bodyText(greeting, ct, reference) {
+
+  var temp = "<container>\n";
+  temp += "  <spacer size=\"16\"></spacer>\n";
+  temp += "  <row>\n";
+  temp += "    <columns>\n";
+  temp += "      <h1>Hello, " + greeting +"</h1>\n";
+  temp += "      <p>Thank you, again, for your feedback.</p>\n";
+  temp += "      <p>Your information has been received.</p>\n";
+  temp += "      <p>You are the " + getOrdinalSuffix(ct) + " honored guest, who has left a feedback.</p>\n";
+  temp += "      <p>Your reference number for further emails is <strong>" + reference + "</strong>.</p>\n";
+  temp += "    </columns>\n";
+  temp += "  </row>\n";
+  temp += "</container>\n";
+
+  return temp;
+} // end bodyText
+
+// Used to determine what suffix to add to the number
+function getOrdinalSuffix(i) {
+  var j = i % 10;
+  var k = i % 100;
+  if (j == 1 && k != 11) {
+    return i + "st";
+  }
+  if (j == 2 && k != 12) {
+    return i + "nd";
+  }
+  if (j == 3 && k != 13) {
+    return i + "rd";
+  }
+  return i + "th";
+} // end getOrdinalSuffix
 
 
 
