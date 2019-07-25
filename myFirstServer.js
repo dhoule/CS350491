@@ -17,7 +17,7 @@ const ffv = require('./node_modules/feedbackformval'); // custom validator
 const nodemailer = require('nodemailer'); // module makes it easy to send emails from your computer
 const uuidv1 = require('uuid/v1');
 // Used to create a database if it does not exist, and make a connection to it.
-const MongoClient = require('mongodb').MongoClient;
+const mongoose = require('mongoose');
 // can assign the appropriate MIME type to the requested resource based on its extension
 const mimeTypes = {
   '.html': 'text/html',
@@ -43,19 +43,34 @@ app.use(express.static('assets'));
 var port = process.env.PORT || 8080;
 
 // The port 27017 is specified by the MongoDB. TODO look this up for deployment to Heroku
-var dbUrl = "mongodb://localhost:27017/";
-var db; // setting this to be global
-console.log('\n\n**********\nAttempting to connect to DB at: ', dbUrl,'\n**********\n\n');
+var dbUrl = process.env.MONGODB_URI || "mongodb://localhost:27017/CS350_491DB";
 
-MongoClient.connect(dbUrl, function (err, client) {
+console.log('\n\n**********\nAttempting to connect to DB at: ', dbUrl,'\n**********\n\n');
+var formModel;
+var db = mongoose.connect(dbUrl, {useNewUrlParser: true}, function (err, client) {
   if (err) throw err;
-  db = client.db("CS350_491DB") ;
   console.log("Database created!");
+
+  // Need to set up some schema
+  var formSchema = new mongoose.Schema({
+    email: String,
+    'first-name': String,
+    'last-name': String,
+    'title-name': String,
+    'body-text': String,
+    phone: String,
+    created_at: Date,
+    reference_id: String
+  });
+  formModel = mongoose.model('Form', formSchema);
   // want to start the server only when the database is connected
-  app.listen(port, () => {
+  app.listen(port, function() {
     console.log('\n\n**********\nlistening on port: ', port,'\n**********\n\n');
-  })
+  });
 });
+
+
+
 
 // This is the only POST route that exists
 app.post('/views/Feedback/index.htm', function (req, res) {
@@ -74,15 +89,23 @@ app.post('/views/Feedback/index.htm', function (req, res) {
       var ts = Date.now(); // Using a timestamp as a reference number
       var parsed = qs.parse(body);
 
-      // DeprecationWarning: collection.save is deprecated. Use insertOne, insertMany, updateOne, or updateMany instead. 
-      db.collection('feedbacks').insertOne(addAttributes(parsed, ts), (err, result) => {
+      var formM = new formModel(addAttributes(parsed, ts));
+      formM.save(function (err, result) {
         if (err) { return console.log(err); }
-
-        console.log('saved to database');
-        sendEmail(parsed['email'],parsed['first-name'],parsed['last-name'],parsed['title-name'],ts);
+        console.log('Saved to database');
+        sendEmail(result['email'],result['first-name'],result['last-name'],result['title-name'],ts);
         res.writeHead(301, {'Content-Type': 'text/plain', Location: '/'} );
         res.end();
       });
+      // DeprecationWarning: collection.save is deprecated. Use insertOne, insertMany, updateOne, or updateMany instead. 
+      // db.collection('feedbacks').insertOne(addAttributes(parsed, ts), (err, result) => {
+      //   if (err) { return console.log(err); }
+
+      //   console.log('saved to database');
+      //   sendEmail(parsed['email'],parsed['first-name'],parsed['last-name'],parsed['title-name'],ts);
+      //   res.writeHead(301, {'Content-Type': 'text/plain', Location: '/'} );
+      //   res.end();
+      // });
     }
     else {
       // There are errors that need to be sent back to the client
@@ -157,7 +180,8 @@ function addAttributes(dirty, ts) {
 // Function is used to send confirmation email.
 function sendEmail(email, first, last, title, reference) {
   
-  db.collection('feedbacks').distinct("email",{},
+  formModel.find().distinct("email",
+  // db.collection('feedbacks').distinct("email",{},
     function(err,num) {
       if(err) { console.log(err); return err; }
       var transporter = nodemailer.createTransport({
