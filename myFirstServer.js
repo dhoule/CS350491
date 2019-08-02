@@ -54,10 +54,10 @@ var db = mongoose.connect(dbUrl, {useNewUrlParser: true}, function (err, client)
   // Need to set up some schema
   var formSchema = new mongoose.Schema({
     email: String,
-    'first-name': String,
-    'last-name': String,
-    'title-name': String,
-    'body-text': String,
+    firstname: String,
+    lastname: String,
+    titlename: String,
+    bodytext: String,
     phone: String,
     created_at: Date,
     reference_id: String
@@ -93,7 +93,7 @@ app.post('/views/Feedback/index.htm', function (req, res) {
       formM.save(function (err, result) {
         if (err) { return console.log(err); }
         console.log('Saved to database');
-        startEmailProcess(result['email'],result['first-name'],result['last-name'],result['title-name'],ts);
+        startEmailProcess(result['email'],result['firstname'],result['lastname'],result['titlename'],ts);
         res.writeHead(301, {'Content-Type': 'text/plain', Location: '/'} );
         res.end();
       });

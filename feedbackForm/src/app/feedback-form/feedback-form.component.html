@@ -1,0 +1,43 @@
+<div class="container">
+  <h3>Comments and/or Suggestions</h3>
+  <form #FeedbackForm="ngForm" class="feedback-form">
+    <label for="titlename">Title:</label>
+    <input type="text" id="titlename" name="titlename" [(ngModel)]="model.titlename" placeholder="Optional"><br>
+    <label for="firstname">First Name:</label>
+    <input type="text" id="firstname" name="firstname" #firstname="ngModel" [(ngModel)]="model.firstname" placeholder="Required" required>
+    <div *ngIf="firstname.invalid && (firstname.dirty || firstname.touched)" class="alert alert-danger">
+      <div *ngIf="firstname.errors.required">
+        First Name is required.
+      </div>
+    </div><br>
+    <label for="lastname">Last Name:</label>
+    <input type="text" id="lastname" name="lastname" #lastname="ngModel" [(ngModel)]="model.lastname" placeholder="Required" required><div *ngIf="lastname.invalid && (lastname.dirty || lastname.touched)" class="alert alert-danger">
+      <div *ngIf="lastname.errors.required">
+        Last Name is required.
+      </div>
+    </div><br>
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" #email="ngModel" [(ngModel)]="model.email" placeholder="Required" required>
+    <div *ngIf="email.invalid && (email.dirty || email.touched)" class="alert alert-danger">
+      <div *ngIf="email.errors.required">
+        Email is required.
+      </div>
+    </div><br>
+    <label for="phone">Phone Num:</label>
+    <input type="tel" id="phone" name="phone" #phone="ngModel" [(ngModel)]="model.phone" placeholder="Optional" pattern="^[0-9]{3}-[0-9]{3}-[0-9]{4}$">
+    <div *ngIf="phone.invalid && (phone.dirty || phone.touched)" class="alert alert-danger">
+      <div *ngIf="phone.errors.pattern">
+        Phone Num must be in the form ###-###-####.
+      </div>
+    </div><br>
+    <label for="bodytext">Message:</label><br>
+    <textarea id="bodytext" name="bodytext" #bodytext="ngModel" [(ngModel)]="model.bodytext" rows = "5" cols = "50" required></textarea>
+    <div *ngIf="bodytext.invalid && (bodytext.dirty || bodytext.touched)" class="alert alert-danger">
+      <div *ngIf="bodytext.errors.required">
+        Email is required.
+      </div>
+    </div><br>
+    <br>
+    <input class="button" type="submit" [disabled]="!FeedbackForm.form.valid" value="Send">
+  </form>
+</div>
